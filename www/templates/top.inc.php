@@ -4,7 +4,7 @@
 <head>
     <title><?php echo filter($GLOBALS['sitename'] . (isset($pagetitle) ? ': ' . $pagetitle : '')); ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="icon" type="image/png" href="<?php echo $GLOBALS['root']; ?>icon.png" />
+    <link rel="icon" href="<?php echo $GLOBALS['root']; ?>favicon.ico" />
     <link rel="stylesheet" type="text/css" href="<?php echo $GLOBALS['root']; ?>scuttle.css" />
     <?php
     $size = count($rsschannels);
@@ -26,7 +26,7 @@ if(isset($_GET['popup'])) {
 ?>
 
 <div id="header"<?php echo $headerstyle; ?>>
-    <h1><a href="<?php echo $GLOBALS['root']; ?>"><?php echo $GLOBALS['sitename']; ?></a></h1>
+    <h1><a href="<?php echo $GLOBALS['root']; ?>"><span><img src="<?= $GLOBALS['root'] ?>images/cc-learn.png" alt="cc learn"/></span></a></h1>
     <?php
     if(!isset($_GET['popup'])) {
         $this->includeTemplate('toolbar.inc');
@@ -34,6 +34,7 @@ if(isset($_GET['popup'])) {
     ?>
 </div>
 
+<div id="content">
 <?php
 if (isset($subtitle)) {
     echo '<h2>'. $subtitle ."</h2>\n";

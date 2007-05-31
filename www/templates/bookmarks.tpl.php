@@ -6,6 +6,8 @@ $logged_on_userid = $userservice->getCurrentUserId();
 $this->includeTemplate($GLOBALS['top_include']);
 
 include('search.inc.php');
+$this->includeTemplate('sidebar.tpl');
+
 if (count($bookmarks) > 0) {
 ?>
 
@@ -25,6 +27,9 @@ window.onload = playerLoad;
     }
     ?>
 </p>
+
+<?php
+?>
 
 <ol<?php echo ($start > 0 ? ' start="'. ++$start .'"' : ''); ?> id="bookmarks">
 
@@ -161,6 +166,5 @@ window.onload = playerLoad;
 
 <?php
 }
-$this->includeTemplate('sidebar.tpl');
 $this->includeTemplate($GLOBALS['bottom_include']);
 ?>

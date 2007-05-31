@@ -6,10 +6,16 @@ if ($userservice->isLoggedOn()) {
 ?>
 
     <ul id="navigation">
-        <li><a href="<?php echo createURL('bookmarks', $cUsername); ?>"><?php echo T_('Bookmarks'); ?></a></li>
+        <li><a href="<?php echo createURL('bookmarks', $cUsername); ?>"><?php echo T_('My Bookmarks'); ?></a></li>
         <li><a href="<?php echo createURL('watchlist', $cUsername); ?>"><?php echo T_('Watchlist'); ?></a></li>
         <li><a href="<?php echo createURL('bookmarks', $cUsername . '?action=add'); ?>"><?php echo T_('Add a Bookmark'); ?></a></li>
-        <li class="access"><a href="<?php echo $GLOBALS['root']; ?>?action=logout"><?php echo T_('Log Out'); ?></a></li>
+        <li class="access">
+          <ul>
+            <li><strong><?= $cUsername ?>:</strong>&nbsp;</li>
+            <li><a href="<?php echo $userservice->getProfileUrl($userid, $user); ?>"><?php echo T_('Profile'); ?></a></li>
+            <li><a href="<?php echo $GLOBALS['root']; ?>?action=logout"><?php echo T_('Log Out'); ?></a></li>
+          </ul>
+        </li>
     </ul>
 
 <?php

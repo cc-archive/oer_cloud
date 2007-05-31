@@ -17,6 +17,7 @@ a img {
 body {
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 input[type=text],
 input[type=password],
@@ -73,8 +74,10 @@ th {
 /* HEADER */
 
 div#header {
-    background: #FFF url('bg_header.png') bottom repeat-x;
-    border-bottom: 3px solid #9CD;
+    padding: 0 2.5%;
+    text-align: left;
+    background: #FFF url('images/cc-header-bg.png') bottom repeat-x;
+    /*border-bottom: 3px solid #9CD;*/
     clear: both;
 }
 div#header:after {
@@ -87,21 +90,23 @@ div#header:after {
 * html div#header {
     height: 1%;
 }
+
 h1 {
     float: left;
     font-size: x-large;
     font-weight: bold;
     letter-spacing: 0.25em;
     margin: 0;
-    padding: 1em;
+    padding: 0.2em 0.3em;
+    padding-top: 0.7em;
     text-transform: lowercase;
 }
 html > body h1 {
-    background: url('logo.png') no-repeat 10px;
-    padding-left: 75px;
+    /*background: url('images/logo.png') no-repeat 10px;
+    padding-left: 75px;*/
 }
 html > body div#header.popup h1 {
-    background: url('logo_24.png') no-repeat 10px;
+    /*background: url('images/logo_24.png') no-repeat 10px;*/
     padding: 0.5em 0.5em 0.5em 50px;
 }
 h1 a {
@@ -110,13 +115,23 @@ h1 a {
 h1 a:hover {
     color: #000;
 }
+/* alternative hack to render a *non* 8bit png in *good* browsers */
+div#header h1 a:before {
+  display: block;
+  content: url('images/cc-learn24.png');
+}
+
+html>body div#header span {
+  display: none;
+}
+
 h2 {
-    background: #666 url('bg_bar.png') center center repeat-x;
-    border-bottom: 3px solid #DDD;
+    /*background: #666 url('images/bg_bar.png') center center repeat-x;*/
+    border-bottom: 1px solid #DDD;
     clear: both;
-    color: #DDD;
+    color: #773;
     font-size: medium;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     margin: 0 0 1em 0;
     padding: 0.5em 1em;
     text-transform: lowercase;
@@ -124,20 +139,29 @@ h2 {
 
 /* NAVIGATION */
 
-ul#navigation {
+ul#navigation, ul#navigation ul {
     list-style-type: none;
     margin: 0;
     padding: 1.75em 1em;
+    padding-top: 2.5em;
     text-transform: lowercase;
     width: auto;
 }
+ul#navigation ul {
+  padding-top: 0;
+}
+ul#navigation ul a {
+  font-size: 1em !important;
+}
+
 ul#navigation a {
-    font-size: medium;
+    font-size: 1.1em;
     font-weight: bold;
+    color: #fff;
     padding: 0.2em 0.5em;
 }
 ul#navigation a:hover {
-    background: #7AD;
+    background: #85ac11;
     color: #FFF;
 }
 ul#navigation li {
@@ -147,38 +171,51 @@ ul#navigation li.access {
     float: right;
 }
 
+
+/* -- CONTENT Block -- */
+
+div#content {
+  width: 95%;
+  margin: 0 auto;
+  text-align: left;
+}
+
 /* BOOKMARKS */
 
 ol#bookmarks {
     list-style-type: none;
     margin: 0;
-    padding: 0 1em;
+    padding: 0 0.5em;
     width: 70%;
 }
+
 html > body ol#bookmarks {
-    margin: 0 1em;
+    margin: 0 0.5em;
     padding: 0;
 }
 div.link a {
     color: blue;
-    font-size: medium;
+    font-size: 1.5em;
+    
 }
 div.link a:visited {
     color: purple;
 }
 div.meta {
-    color: #285;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #888;
 }
 div.meta span {
     color: #F00;
 }
 li.xfolkentry {
-    border-bottom: 1px solid #DDD;
+    /*border-bottom: 1px solid #DDD;*/
     margin-bottom: 0;
     padding: 1em 0.5em;
 }
 html > body li.xfolkentry {
-    border-bottom: 1px dotted #AAA;
+    /*border-bottom: 1px dotted #AAA;*/
 }
 li.xfolkentry div {
     padding: 0.1em;
@@ -197,21 +234,23 @@ li.xfolkentry.shared {
 
 div#sidebar {
     font-size: small;
-    position: absolute;
-    right: 1em;
-    top: 10em;
-    width: 25%;
+    /*position: absolute;
+    right: 3%;
+    top: 12em;*/
+    padding-right: 1em;
+    float: right;
+    width: 22%;
 }
 div#sidebar a {
-    color: #995;
+    color: #552;
 }
 div#sidebar a:hover {
     color: #773;
 }
 div#sidebar div {
-    background: #FFF url('bg_sidebar.png') bottom repeat-x;
-    border: 1px solid #CC8;
-    color: #555;
+    /*background: #FFF url('images/bg_sidebar.png') bottom repeat-x;*/
+    border-left: 1px solid #CCC;
+    color: #333;
     margin-bottom: 1em;
 }
 div#sidebar h2 {
@@ -272,6 +311,18 @@ p.tags span.selected {
 
 table.profile th {
     width: 10em;
+}
+
+/* FOOTER */
+div#footer {
+  position: relative;
+  background: url('images/bg-std.png') repeat-x top left;
+  clear: both;
+  margin-top: 100px;
+  padding: 20px 10px;
+  padding-bottom: 35px;
+  color: #888;
+  font-size: 0.9em;
 }
 
 /* OTHER GUFF */
@@ -373,19 +424,19 @@ p {
     margin: 1em;
 }
 p#sort {
-    color: #CCC;
+    color: #773;
     font-size: small;
     float: right;
     margin: 0;
     position: absolute;
-    right: 0;
+    right: 3.5%;
     top: 7em;
 }
 html > body p#sort {
     margin-right: 0.75em;
 }
 p#sort a {
-    background: #AAA;
+    background: #ccc;
     color: #555;
     font-weight: normal;
     margin-right: 0.5em;
@@ -395,7 +446,7 @@ html > body p#sort a {
     margin-right: 0;
 }
 p#sort a:hover {
-    background: #CCC;
+    background: #aaa;
     text-decoration: none !important;
 }
 p#sort span {
@@ -404,6 +455,7 @@ p#sort span {
 p.paging {
 	font-size: small;
 	margin-left: 1em;
+
 }
 p.paging a,
 p.paging span.disable {
