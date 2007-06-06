@@ -5,7 +5,6 @@ $bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
 $logged_on_userid = $userservice->getCurrentUserId();
 $this->includeTemplate($GLOBALS['top_include']);
 
-include('search.inc.php');
 $this->includeTemplate('sidebar.tpl');
 
 if (count($bookmarks) > 0) {

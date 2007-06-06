@@ -85,7 +85,7 @@ $dbname = 'oer';
 # reservedusers : An array of usernames that cannot be registered
 ######################################################################
 
-$sitename           = 'CC OER';
+$sitename           = 'ccLearn - OER Cloud';
 $locale             = '';
 $top_include        = 'top.inc.php';
 $bottom_include     = 'bottom.inc.php';
@@ -96,11 +96,11 @@ $defaultPerPage     = 10;
 $defaultRecentDays  = 14;
 $defaultOrderBy     = 'date_desc';
 $TEMPLATES_DIR      = dirname(__FILE__) .'/templates/';
-$root               = NULL;
+$root               = '/';
 $cookieprefix       = 'CC_OER';
 $tableprefix        = 'sc_';
 $adminemail         = 'webmaster@creativecommons.org';
-$cleanurls          = false;
+$cleanurls          = true;
 
 $usecache           = false;
 $dir_cache          = dirname(__FILE__) .'/cache/';
