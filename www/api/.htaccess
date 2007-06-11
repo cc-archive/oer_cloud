@@ -4,6 +4,7 @@ RewriteRule ^posts/dates posts_dates.php
 RewriteRule ^posts/get posts_get.php
 RewriteRule ^posts/recent posts_recent.php
 RewriteRule ^posts/all posts_all.php
+RewriteRule ^posts/google_coop posts_google_coop.php
 RewriteRule ^posts/update posts_update.php
 RewriteRule ^posts/add posts_add.php
 RewriteRule ^posts/delete posts_delete.php
