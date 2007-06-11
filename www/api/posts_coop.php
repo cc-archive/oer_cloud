@@ -1,11 +1,6 @@
 <?php
-// Implements the del.icio.us API request for all a user's posts, optionally filtered by tag.
+// Generate a Google Co-Op Annotation file for all posts.
 
-// del.icio.us behavior:
-// - doesn't include the filtered tag as an attribute on the root element (we do)
-
-// Force HTTP authentication first!
-// require_once('httpauth.inc.php');
 require_once('../header.inc.php');
 
 $bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
@@ -23,16 +18,11 @@ else
 // Get the posts relevant to the passed-in variables.
 $bookmarks =& $bookmarkservice->getBookmarks(0, NULL, NULL, $tag);
 
-// $currentuser = $userservice->getCurrentUser();
-// $currentusername = $currentuser[$userservice->getFieldName('username')];
-
 // Set up the XML file and output all the posts.
 header('Content-Type: text/xml');
 echo '<?xml version="1.0" ?'.">";
 echo '<GoogleCustomizations>';
 echo '<Annotations>';
-
-// echo '<posts update="'. gmdate('Y-m-d\TH:i:s\Z') .'" user="'. htmlspecialchars($currentusername) .'"'. (is_null($tag) ? '' : ' tag="'. htmlspecialchars($tag) .'"') .">\r\n";
 
 foreach($bookmarks['bookmarks'] as $row) {
 
@@ -41,7 +31,7 @@ foreach($bookmarks['bookmarks'] as $row) {
 
     echo '<Annotation about="' . $bookmark_url . '" score="1" >';
 
-    // XXX Add a "lable" to identify which coop this goes with
+    // Add a "lable" to identify which coop this goes with
     echo '<Label name="' . $cse . '" />';
 
     /// Output the tags
@@ -52,7 +42,6 @@ foreach($bookmarks['bookmarks'] as $row) {
 
     echo "</Annotation>";
 
-    // echo "\t<post href=\"". filter($row['bAddress'], 'xml') .'" description="'. filter($row['bTitle'], 'xml') .'" '. $description .'hash="'. md5($row['bAddress']) .'" tag="'. filter($taglist, 'xml') .'" time="'. gmdate('Y-m-d\TH:i:s\Z', strtotime($row['bDatetime'])) ."\" />\r\n";
 }
 
 echo '</Annotations>';
