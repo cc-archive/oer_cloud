@@ -26,8 +26,17 @@ echo '<Annotations>';
 
 foreach($bookmarks['bookmarks'] as $row) {
 
-    // XXX Get the bookmark URL and make it a wildcard`
+    // Get the bookmark URL and make it a wildcard`
     $bookmark_url = filter($row['bAddress'], 'xml');
+    $url_info = parse_url($bookmark_url);
+    if ( ((substr($url_info['path'], -1) == '/') && ($url_info['query'] == ''))
+        || ($url_info['path'] == '' && $url_info['query'] == '') ) {
+
+	if (substr($bookmark_url, -1) != '/') 
+	    $bookmark_url = $bookmark_url . "/";
+
+        $bookmark_url = $bookmark_url . "*";
+    }
 
     echo '<Annotation about="' . $bookmark_url . '" score="1" >';
 
