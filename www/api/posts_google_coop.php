@@ -15,10 +15,10 @@ $userservice =& ServiceFactory::getServiceInstance('UserService');
 $userservice->logout();
 
 // Check to see if a tag was specified.
-if (isset($_REQUEST['tag']) && (trim($_REQUEST['tag']) != ''))
-    $tag = trim($_REQUEST['tag']);
+if (isset($_REQUEST['cse']) && (trim($_REQUEST['cse']) != ''))
+    $cse = trim($_REQUEST['cse']);
 else
-    $tag = NULL;
+    $cse = "_cse_we9jedjkeci";
 
 // Get the posts relevant to the passed-in variables.
 $bookmarks =& $bookmarkservice->getBookmarks(0, NULL, NULL, $tag);
@@ -28,9 +28,9 @@ $bookmarks =& $bookmarkservice->getBookmarks(0, NULL, NULL, $tag);
 
 // Set up the XML file and output all the posts.
 header('Content-Type: text/xml');
-echo '<?xml version="1.0" ?'.">\r\n";
-echo '<GoogleCustomizations>\r\n';
-echo '<Annotations>\r\n';
+echo '<?xml version="1.0" ?'.">";
+echo '<GoogleCustomizations>';
+echo '<Annotations>';
 
 // echo '<posts update="'. gmdate('Y-m-d\TH:i:s\Z') .'" user="'. htmlspecialchars($currentusername) .'"'. (is_null($tag) ? '' : ' tag="'. htmlspecialchars($tag) .'"') .">\r\n";
 
@@ -39,21 +39,22 @@ foreach($bookmarks['bookmarks'] as $row) {
     // XXX Get the bookmark URL and make it a wildcard`
     $bookmark_url = filter($row['bAddress'], 'xml');
 
-    echo '<Annotation about="' . $bookmark_url . '" score="1" >\r\n';
+    echo '<Annotation about="' . $bookmark_url . '" score="1" >';
 
     // XXX Add a "lable" to identify which coop this goes with
-    echo '<Label name="_cse_XXX" />\r\n';
+    echo '<Label name="' . $cse . '" />';
 
     /// Output the tags
     if (count($row['tags']) > 0) {
         foreach($row['tags'] as $tag)
-            echo '<Label name="' . convertTag($tag) . '" />\r\n';
+            echo '<Label name="' . convertTag($tag) . '" />';
     }
 
-    echo "</Annotation>\r\n";
+    echo "</Annotation>";
 
     // echo "\t<post href=\"". filter($row['bAddress'], 'xml') .'" description="'. filter($row['bTitle'], 'xml') .'" '. $description .'hash="'. md5($row['bAddress']) .'" tag="'. filter($taglist, 'xml') .'" time="'. gmdate('Y-m-d\TH:i:s\Z', strtotime($row['bDatetime'])) ."\" />\r\n";
 }
 
-echo '</Annotations>\r\n</GoogleCustomizations>\r\n';
+echo '</Annotations>';
+echo '</GoogleCustomizations>';
 ?>
