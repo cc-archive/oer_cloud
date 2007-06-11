@@ -23,19 +23,19 @@ $tags =& $tagservice->getTags();
 header('Content-Type: text/xml');
 echo <<<HEADER
 <?xml version="1.0" encoding="UTF-8" ?>
-<GoogleCustomizations>
-  <CustomSearchEngine version="1.0" volunteers="true" keywords="oai" 
+<GoogleCustomizations version="1.0">
+  <CustomSearchEngine volunteers="true" keywords="oai" 
   Title="OER Search" Description="Test Engine for OER import." language="en">
-    <Context refinementsTitle="Refine results for $q:">
+    <Context refinementsTitle="Refine results for \$q:">
       <BackgroundLabels>
         <Label name="_cse_we9jedjkeci" mode="FILTER" />
         <Label name="_cse_exclude_we9jedjkeci" mode="ELIMINATE" />
       </BackgroundLabels>
 HEADER;
 
-foreach ($tags['tags'] as $tag) {
+foreach ($tags as $tag) {
 
-   echo $tag . "\n";
+   echo '<Facet><FacetItem title="' . $tag['tag'] . '"><Label name="' . $tag['tag'] . '" mode="FILTER" /></FacetItem></Facet>';
 
 }
 
@@ -44,11 +44,12 @@ echo <<<FOOTER
     </Context>
     <LookAndFeel nonprofit="true" />
 
+  </CustomSearchEngine>
+
     <!-- include the OER Cloud annotations -->
     <Include type="Annotations" 
-       href="http://oercloud.creativecommons.org/api/posts/google_coop" />
+       href="http://oercloud.creativecommons.org/api/posts/coop" />
 
-  </CustomSearchEngine>
 </GoogleCustomizations>
 FOOTER;
 
