@@ -4,13 +4,11 @@ $this->includeTemplate($GLOBALS['top_include']);
 
 
 <h3 id="oer">Open Educational Resource links</h3>
-<p>Help us collecting and tag <a href="http://en.wikipedia.org/wiki/Open_educational_resources">Open Education Resource</a> links to seed a web scale OER search engine.</p>
+<p>Help us collect and tag <a href="http://en.wikipedia.org/wiki/Open_educational_resources">Open Education Resource</a> links to seed a web scale OER search engine.  See <a href="http://learn.creativecommons.org/oer-search-faq/">this FAQ</a> for details.</p>
 
 <p>While this collection of links and tags is in the public domain, the OERs linked to are available under CC licenses or other terms specified by their owners; check each site for details.</p>
 
 <p>This site is run by <a href="http://learn.creativecommons.org">ccLearn</a>, a project of <a href="http://creativecommons.org">Creative Commons</a>, with support from <a href="http://www.hewlett.org">The William and Flora Hewlett Foundation</a>.</p>
-
-<p>For detailed information about specific resources, visit collections at <a href="http://www.oercommons.org">OER Commons</a> and ...</p>
 
 <h3 id="geek"><?php echo T_('Geek Stuff'); ?></h3>
 <ul>
