@@ -10,6 +10,13 @@ window.onload = function() {
 
 <form action="<?php echo $formaction; ?>" method="post">
     <div><input type="hidden" name="query" value="<?php echo $querystring; ?>" /></div>
+    <?php    
+        if($GLOBALS['recaptcha_public_key']) {
+            require_once('recaptchalib.php');    
+            $publickey = $GLOBALS['recaptcha_public_key'];
+            echo recaptcha_get_html($publickey);
+        }
+    ?>
     <table>
     <tr>
         <th align="left"><label for="username"><?php echo T_('Username'); ?></label></th>

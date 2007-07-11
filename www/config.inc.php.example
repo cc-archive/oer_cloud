@@ -116,5 +116,8 @@ $filetypes          = array(
                         );
 $reservedusers      = array('all', 'watchlist');
 
+$recaptcha_public_key = false;
+$recaptcha_private_key = false;
+
 include_once('debug.inc.php');
 ?>

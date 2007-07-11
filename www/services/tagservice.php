@@ -40,10 +40,14 @@ class TagService {
                 $tags = null;
             }
         }
+        
+        // convert tags that are in the 
+        // global tag_convert_map
+        $tags = $this->queryTagMap($tags);
 
         $tags_count = count($tags);
         for ($i = 0; $i < $tags_count; $i++) {
-            $tags[$i] = trim(strtolower($tags[$i]));
+            $tags[$i] = trim(utf8_strtolower($tags[$i]));
             if ($fromApi) {
                 include_once(dirname(__FILE__) .'/../functions.inc.php');
                 $tags[$i] = convertTag($tags[$i], 'in');
@@ -198,7 +202,7 @@ class TagService {
         if (is_numeric($tags))
             $tags = NULL;
         if (!is_array($tags) and !is_null($tags))
-            $tags = explode('+', trim($tags));
+            $tags = explode(',', trim($tags));
 
         $tagcount = count($tags);
         for ($i = 0; $i < $tagcount; $i++) {
@@ -354,6 +358,71 @@ class TagService {
         }
 
         return $output;
+    }
+
+    function queryTagMap($tags) {
+        // read the file into an array
+        $fileName = 'tagmap.array';
+        $mapFile = fopen($fileName, 'r') or die;
+        $tagMap = array();
+
+        while($line = fgets($mapFile))  {
+            $line = trim($line);
+            $spacePos = stripos($line, ' ');
+            $tagMap[substr($line, 0, $spacePos)] = substr($line, $spacePos, strlen($line));
+        }
+
+        fclose($mapFile);
+
+        // change the unwanted tags (if any) to
+        // the desired tags
+        $tagCount = 0;
+        foreach($tags as $tag) {
+            if(array_key_exists($tag, $tagMap)) {
+                $tags[$tagCount] = $tagMap[$tag];
+            }
+            $tagCount++;
+        }
+
+        return $tags;
+    }
+
+    function addEntryToTagMap($fromTag, $toTag) {
+        if(strlen($fromTag) > 32 or strlen($toTag) > 32) 
+            return false;
+        $userservice =& ServiceFactory::getServiceInstance('UserService');
+        $fromTag = $userservice->safeString($fromTag);
+        $toTag = $userservice->safeString($toTag);
+
+        // read the file into an array
+        $fileName = 'tagmap.array';
+        $mapFile = fopen($fileName, 'r');
+        if(!$mapFile) 
+            return false;
+        $tagMap = array();
+
+        while($line = fgets($mapFile))  {
+            $line = trim($line);    
+            $spacePos = stripos($line, ' ');    
+            $tagMap[substr($line, 0, $spacePos)] = substr($line, $spacePos, strlen($line));
+        }
+
+        fclose($mapFile);
+        
+        // add the new entry to the array
+        $tagMap[$fromTag] = $toTag; 
+
+        // write the array to the file
+        $mapFile = fopen($fileName, 'w');
+        $tagKeys = array_keys($tagMap);
+
+        for($i = 0; $i<count($tagKeys); $i++) {
+            $s = $tagKeys[$i] .' '. $tagMap[$tagKeys[$i]] . "\n";
+            fwrite($mapFile, $s);
+        }
+
+        fclose($mapFile);
+        return true;
     }
 
     // Properties

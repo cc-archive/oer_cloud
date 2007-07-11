@@ -73,7 +73,7 @@ class BookmarkService {
 
         $userservice = & ServiceFactory :: getServiceInstance('UserService');
         $userid = $userservice->getCurrentUserId();
-        if ($userservice->isAdmin($userid))
+        if ($userservice->isAdminByUID($userid))
             return true;
         else
             return ($bookmark['uId'] == $userid);
@@ -337,7 +337,8 @@ class BookmarkService {
             $query_4 .= ' AND B.bHash = "'. $hash .'"';
         }
 
-        $query = $query_1 . $query_2 . $query_3 . $query_4 . $query_5;
+        $queryFlag = " AND U.isFlagged = 0 ";
+        $query = $query_1 . $query_2 . $query_3 . $query_4 . $queryFlag . $query_5;
         if (!($dbresult = & $this->db->sql_query_limit($query, intval($perpage), intval($start)))) {
             message_die(GENERAL_ERROR, 'Could not get bookmarks', '', __LINE__, __FILE__, $query, $this->db);
             return false;
@@ -346,7 +347,7 @@ class BookmarkService {
         if (SQL_LAYER == 'mysql4') {
             $totalquery = 'SELECT FOUND_ROWS() AS total';
         } else {
-            $totalquery = 'SELECT COUNT(*) AS total'. $query_2 . $query_3 . $query_4;
+            $totalquery = 'SELECT COUNT(*) AS total '. $query_2 . $query_3 . $query_4 . $queryFlag;
         }
 
         if (!($totalresult = & $this->db->sql_query($totalquery)) || (!($row = & $this->db->sql_fetchrow($totalresult)))) {

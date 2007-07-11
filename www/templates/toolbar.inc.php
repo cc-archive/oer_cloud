@@ -3,6 +3,7 @@ $userservice =& ServiceFactory::getServiceInstance('UserService');
 if ($userservice->isLoggedOn()) {
     $cUser = $userservice->getCurrentUser();
     $cUsername = $cUser[$userservice->getFieldName('username')];
+    $isAdmin = $userservice->isAdminByUsername($cUsername);
 ?>
 
     <ul id="navigation">
@@ -16,6 +17,9 @@ if ($userservice->isLoggedOn()) {
             <li><a href="<?php echo $GLOBALS['root']; ?>?action=logout"><?php echo T_('Log Out'); ?></a></li>
           </ul>
         </li>
+        <?php if ($isAdmin): ?>
+        &mdash; <a href="<?php echo $GLOBALS['root']; ?>admin.php"><?php echo T_('Admin'); ?></a>
+        <?php endif; ?>
     </ul>
 
 <?php
