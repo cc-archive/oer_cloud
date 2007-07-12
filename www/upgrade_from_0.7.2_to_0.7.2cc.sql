@@ -1,5 +1,4 @@
 ALTER TABLE `sc_bookmarks`
-ADD KEY `sc_bookmarks_du` (`bDatetime`,`uId`),
 ADD KEY `sc_bookmarks_hu` (`bHash`,`uId`);
 
 ALTER TABLE `sc_tags`
