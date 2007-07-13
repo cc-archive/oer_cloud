@@ -1,4 +1,5 @@
 <?php
+require_once('recaptchalib.php');
 $this->includeTemplate($GLOBALS['top_include']);
 ?>
 
@@ -27,6 +28,19 @@ window.onload = function() {
     <td><input type="text" id="email" name="email" size="40" class="required" /></td>
     <td></td>
 </tr>
+
+  <?php if ($GLOBALS['use_recaptcha']) {  ?>
+
+<tr>
+    <th align="left"><?php echo T_('Read books'); ?></th>
+    <td>
+    <?php echo recaptcha_get_html($GLOBALS['recaptcha_public_key']); ?>
+</td>
+    <td></td>
+</tr>
+					
+  <?php } ?>
+
 <tr>
     <td></td>
     <td><input type="submit" name="submitted" value="<?php echo T_('Register'); ?>" /></td>

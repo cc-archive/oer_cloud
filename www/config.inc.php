@@ -25,12 +25,18 @@
 # dbname:   Database name
 ######################################################################
 
-$dbtype = 'mysql4';
+$dbtype = 'mysql';
 $dbhost = '127.0.0.1';
 $dbport = '3306';
 $dbuser = 'scuttle';
 $dbpass = '';
 $dbname = 'oer';
+
+## OPTIONAL: Configure recaptcha
+$use_recaptcha = true;
+// put your recaptcha config variables in recaptcha_config.inc.php
+// use recaptcha_config.inc.template as a template
+require_once('recaptcha_config.inc.php');
 
 ######################################################################
 # You have finished configuring the database!

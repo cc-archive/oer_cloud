@@ -1,0 +1,4 @@
+<?php
+$recaptcha_public_key = 'something long';
+$recaptcha_private_key = 'something long';
+?>

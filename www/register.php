@@ -20,17 +20,39 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ***************************************************************************/
 
 require_once('header.inc.php');
+require_once('recaptchalib.php');
 $userservice =& ServiceFactory::getServiceInstance('UserService');
 $templateservice =& ServiceFactory::getServiceInstance('TemplateService');
 
 $tplVars = array();
-
 if ($_POST['submitted']) {
     $posteduser = trim(utf8_strtolower($_POST['username']));
+    $captcha_invalid = false;
 
-    // Check if form is incomplete
+    // validate recaptcha
+    if ($GLOBALS['use_recaptcha']) {
+      $recaptcha_result = 
+	recaptcha_check_answer($GLOBALS['recaptcha_private_key'],
+			       $_SERVER['REMOTE_ADDR'],
+			       $_POST['recaptcha_challenge_field'],
+			       $_POST['recaptcha_response_field']);
+      
+      if ($recaptcha_result->is_valid) {
+	// great!
+      }
+      else {
+	$captcha_invalid = true;
+      }
+    }
+      
+      // Check if form is incomplete
     if (!($posteduser) || !($_POST['password']) || !($_POST['email'])) {
         $tplVars['error'] = T_('You <em>must</em> enter a username, password and e-mail address.');
+    
+
+    // Check if the user failed the captcha
+    } elseif ($captcha_invalid) {
+      $tplVars['error'] = T_('You did not correctly prove you are a human.  Go back and try reading the book again.');
 
     // Check if username is reserved
     } elseif ($userservice->isReserved($posteduser)) {
@@ -55,7 +77,7 @@ if ($_POST['submitted']) {
     } else {
         $tplVars['error'] = T_('Registration failed. Please try again.');
     }
-}
+ }
 
 $tplVars['loadjs']      = true;
 $tplVars['subtitle']    = T_('Register');
