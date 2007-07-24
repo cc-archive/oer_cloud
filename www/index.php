@@ -25,6 +25,7 @@ $templateservice =& ServiceFactory::getServiceInstance('TemplateService');
 $userservice =& ServiceFactory::getServiceInstance('UserService');
 $cacheservice =& ServiceFactory::getServiceInstance('CacheService');
 
+
 $tplvars = array();
 if (isset($_GET['action'])){
     if ($_GET['action'] == "logout") {
@@ -52,7 +53,8 @@ if ($usecache) {
 }
 
 // Pagination
-$perpage = getPerPageCount();
+#$perpage = getPerPageCount();
+$perpage = 25;
 if (isset($_GET['page']) && intval($_GET['page']) > 1) {
     $page = $_GET['page'];
     $start = ($page - 1) * $perpage;
@@ -62,12 +64,13 @@ if (isset($_GET['page']) && intval($_GET['page']) > 1) {
 }
 
 $dtend = date('Y-m-d H:i:s', strtotime('tomorrow'));
-$dtstart = date('Y-m-d H:i:s', strtotime($dtend .' -'. $defaultRecentDays .' days'));
+#$dtstart = date('Y-m-d H:i:s', strtotime($dtend .' -'. $defaultRecentDays .' days'));
+$dtstart = date('Y-m-d H:i:s', strtotime($dtend .' - 365 days'));
 
 $tplVars['page'] = $page;
 $tplVars['start'] = $start;
 $tplVars['popCount'] = 30;
-$tplVars['sidebar_blocks'] = array('recent');
+$tplVars['sidebar_blocks'] = array('recent', 'popular');
 $tplVars['range'] = 'all';
 $tplVars['pagetitle'] = T_('Store, share and tag your open education links');
 $tplVars['subtitle'] = T_('Recent URLs');

@@ -688,5 +688,171 @@ class UserService {
 
     function getCookieKey()       { return $this->cookiekey; }
     function setCookieKey($value) { $this->cookiekey = $value; }
+
+
+	/**select box
+	 *
+	 * Functions added by Nathan Kinkade
+	 *
+	 */
+
+	# Get all users that have admin privileges
+	function getAllUsers($sort = "username") {
+
+		# do some input validation on the $sort variable
+		switch ( $sort ) {
+			case "isAdmin":		$orderBy = "isAdmin DESC, username"; break;
+			case "isFlagged":	$orderBy = "isFlagged DESC, username"; break;
+			case "uStatus":		$orderBy = "uStatus, username"; break;
+			case "username":	$orderBy = "username"; break;
+			case "name":		$orderBy = "name, username"; break;
+			case "uDatetime":	$orderBy = "uDatetime DESC, username"; break;
+			case "uModified":	$orderBy = "uModified DESC, username"; break;
+			case "email":		$orderBy = "email, username"; break;
+			case "homepage":	$orderBy = "homepage, username"; break;
+			default:			$orderBy = "username";
+		}
+
+		$sql = sprintf ("
+			SELECT * FROM %s
+			ORDER BY %s
+			",
+			"{$GLOBALS['tableprefix']}users",
+			$orderBy
+		);
+		$queryId = $this->db->sql_query($sql);
+
+		$users = $this->db->sql_fetchrowset($queryId);
+
+		return $users;
+
+	}
+
+	# make changes to users
+	function modifyUsers() {
+
+		global $tplVars;
+
+		# initialize a sql string
+		$sql = "";
+
+		if ( isset($_POST['userList']) ) {
+			# pull list of user ids from the submitted form
+			$userIds = implode(",", $_POST['userList']);
+			switch ( $_POST['modifyUsersAction'] ) {
+				case "activate":
+					$sql = sprintf ("
+						UPDATE %susers SET uStatus = '1'
+						WHERE %s IN ($userIds)
+						",
+						$GLOBALS['tableprefix'], 
+						$this->fields['primary']
+					);
+					$actionMsg = "Activating the selected user(s)";
+					break;
+				case "deactivate":
+					$sql = sprintf ("
+						UPDATE %susers SET uStatus = '0'
+						WHERE %s IN ($userIds)
+						",
+						$GLOBALS['tableprefix'], 
+					   	$this->fields['primary']
+					);
+					$actionMsg = "Deactivating the selected user(s)";
+					break;
+				case "flag":
+					$sql = sprintf ("
+						UPDATE %s SET isFlagged = '1'
+						WHERE %s IN ($userIds)
+						",
+						$GLOBALS['tableprefix'], 
+						$this->fields['primary']
+					);
+					$actionMsg = "Flagging the selected user(s)";
+					break;
+				case "unflag":
+					$sql = sprintf ("
+						UPDATE %s SET isFlagged = '0'
+						WHERE %s IN ($userIds)
+						",
+						$GLOBALS['tableprefix'], 
+						$this->fields['primary']
+					);
+					$actionMsg = "Unflagging the selected user(s)";
+					break;
+				case "makeAdmin":
+					$sql = sprintf ("
+						UPDATE %s SET isAdmin = '1'
+						WHERE %s IN ($userIds)
+						",
+						$GLOBALS['tableprefix'], 
+						$this->fields['primary']
+					);
+					$actionMsg = "Granting admin privileges to the selected user(s)";
+					break;
+				case "yankAdmin":
+					$sql = sprintf ("
+						UPDATE %s SET isAdmin = '0'
+						WHERE %s IN ($userIds)
+						",
+						$GLOBALS['tableprefix'], 
+						$this->fields['primary']
+					);
+					$actionMsg = "Revoking admin privileges from the selected user(s)";
+					break;
+				case "delete":
+					$sql = sprintf ("
+						DELETE %susers.*, %sbookmarks.*, %sstags.*
+						FROM %susers LEFT JOIN %sbookmarks
+							ON %susers.%s = %sbookmarks.%s
+						LEFT JOIN %stags
+							ON %sbookmarks.bId = %stags.bId
+						WHERE %susers.%s IN (%s);
+						",
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$this->fields['primary'],
+						$GLOBALS['tableprefix'],
+						$this->fields['primary'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$this->fields['primary'],
+						$userIds
+					);
+					$actionMsg = "Deleting the selected user(s)";
+				default:
+					$sql = "";
+					$tplVars['error'] = "Unrecognized action. No changes were made.";
+			}
+
+        	# Execute the sql statement.
+			$this->db->sql_transaction('begin');
+			if ( ! ($dbresult = & $this->db->sql_query($sql)) ) {
+				$this->db->sql_transaction('rollback');
+				$tplVars['error'] = "$actionMsg failed.";
+				return false;
+			}
+			$tplVars['msg'] = "$actionMsg was successful.";
+			$this->db->sql_transaction('commit');
+			return true;
+		} else {
+			$tplVars['error'] =  "You must select at least one user.";
+			return false;
+		}
+
+	}
+
+	# make changes to tags
+	function modifyTags() {
+
+	}
+	
 }
+
 ?>

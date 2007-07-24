@@ -45,6 +45,14 @@ else if(!$userservice->isAdminByUsername($current_user['username'])) {
 }
 else { 
     // legitimate administrator accessing the page
+
+	if ( isset($_POST['doModifyUsers']) ) {
+		$userservice->modifyUsers();
+	} elseif ( isset($_POST['doModifyTags']) ) {
+		$userservice->modifyTags();
+	}
+
+	/*
     if(0 < count($_POST)) { 
         // at least one variable was POSTed
         $paaResult = $userservice->performAdminActions($_POST);
@@ -63,6 +71,8 @@ else {
                 break;
         }
     }
+	*/
+
     if($userservice->isAdminPassDefault($current_user['username'])) {
         $tplVars['error'] .= " PLEASE CHANGE THE ADMIN DEFAULT PASSWORD!";
     }

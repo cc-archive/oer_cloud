@@ -1,172 +1,171 @@
 <?php
+
 $userservice =& ServiceFactory::getServiceInstance('UserService');
+
 $this->includeTemplate($GLOBALS['top_include']);
-echo "<p>" . $commitresult . "</p>\n"; 
-?>
-<form action="<?php echo $formaction; ?>" method="post">
-    <h2> -- <?php echo T_("User Options"); ?> -- <h2/>
-    <h3> <?php echo T_("Administrators (allowed access to this console)"); ?> </h3> 
 
-    <table border="1" name="administrator_table">
-    <tr>
-        <th><?php echo T_("Username"); ?> </th>
-        <th><?php echo T_("Name"); ?> </th>
-        <th><?php echo T_("Email"); ?> </th>
-        <th><?php echo T_("IP Address"); ?> </th>
-        <th><?php echo T_("Homepage"); ?> </th>
-        <th><?php echo T_("uModified"); ?> </th>
-        <th><?php echo T_("uDatetime"); ?> </th>
-        <th><?php echo T_("Demote to Regular"); ?>  </th>
-    </tr>
-        
-    <?php
-    $ordered_users = $userservice->getUsersByCategory();
-    $form_loop_count = 0;
-    foreach($ordered_users['admins'] as $row)
-    {
-        echo "<tr><td>" . 
-        $row['username'] . '</td><td>' .
-        $row['name'] . '</td><td>' .
-        $row['email'] . '</td><td>' .
-        $row['uIp'] . '</td><td>' .
-        $row['homepage'] . '</td><td>' .
-        $row['uModified'] . '</td><td>' .
-        $row['uDatetime'] . "</td><td>" .
-        '<input type="radio" name="' . $row['username'] .
-        '" value="revoke_admin_access"' .
-        '" /></td></tr>' , "\n";
-        $form_loop_count++;
-    }
-    ?>
-    </table>
+if ( ! empty($updateResults) ) {
+	echo "<p>$udpateResults</p>\n";
+}
 
-    <h3> <?php echo T_("Registered Users"); ?> </h3> 
-    <table border="1" name="regular_table">
-    <tr>
-        <th><?php echo T_("Username"); ?> </th>
-        <th><?php echo T_("Name"); ?> </th>
-        <th><?php echo T_("Email"); ?> </th>
-        <th><?php echo T_("IP Address"); ?> </th>
-        <th><?php echo T_("Homepage"); ?> </th>
-        <th><?php echo T_("uModified"); ?> </th>
-        <th><?php echo T_("uDatetime"); ?> </th>
-        <th><?php echo T_("Promote to Admin"); ?>  </th>
-        <th><?php echo T_("Flag"); ?> </th>
-    </tr>
+echo <<<HTML
+<script type='text/javascript'>
 
-    <?php
-    $form_loop_count = 0;
-    foreach($ordered_users['registered'] as $row)
-    {
-        echo "<tr>";
-        echo "<td>" . $row['username'] . '</td><td>' .
-        $row['name'] . '</td><td>' .
-        $row['email'] . '</td><td>' .
-        $row['uIp'] . '</td><td>' .
-        $row['homepage'] . '</td><td>' .
-        $row['uModified'] . '</td><td>' .
-        $row['uDatetime'] . "</td><td>" .
-        '<input type="radio" name="' . $row['username'] .
-        '" value="promote_to_admin' . 
-        '" /></td><td>' . 
-        '<input type="radio" name="' . $row['username'] .
-        '" value="flag' .
-        "\"/></td></tr>\n";
-        $form_loop_count++;
-    }
-    ?>
-    </table>
+function getElement(elemid) {
+	/* the former for Firefox and crew, the latter for IE */
+	return (document.getElementById) ? document.getElementById(elemid) : document.all[elemid];
+}
 
-    <h3> <?php echo T_("Unregistered Users"); ?> </h3> 
-    <table border="1" name="regular_table">
-    <tr>
-        <th><?php echo T_("Username"); ?> </th>
-        <th><?php echo T_("Name"); ?> </th>
-        <th><?php echo T_("Email"); ?> </th>
-        <th><?php echo T_("IP Address"); ?> </th>
-        <th><?php echo T_("Homepage"); ?> </th>
-        <th><?php echo T_("uModified"); ?> </th>
-        <th><?php echo T_("uDatetime"); ?> </th>
-        <th><?php echo T_("Approve Registration"); ?>  </th>
-        <th><?php echo T_("Flag"); ?> </th>
-    </tr>
+function showUsers(userDiv,tagDiv) {
+	var divAdminUsers = getElement(userDiv);
+	var divAdminTags = getElement(tagDiv);
+	divAdminUsers.style.display = "";
+	divAdminTags.style.display = "none";
+	return true;
+}
 
-    <?php
-    $form_loop_count = 0;
-    foreach($ordered_users['unregistered'] as $row)
-    {
-        echo "<tr>";
-        echo "<td>" . $row['username'] . '</td><td>' .
-        $row['name'] . '</td><td>' .
-        $row['email'] . '</td><td>' .
-        $row['uIp'] . '</td><td>' .
-        $row['homepage'] . '</td><td>' .
-        $row['uModified'] . '</td><td>' .
-        $row['uDatetime'] . "</td><td>" .
-        '<input type="radio" name="' . $row['username'] .
-        '" value="approve_registration' . 
-        '" /></td><td>' . 
-        '<input type="radio" name="' . $row['username'] .
-        '" value="flag' .
-        "\"/></td></tr>\n";
-        $form_loop_count++;
-    }
-    ?>
-    </table>
+function showTags(tagDiv,userDiv) {
+	var divAdminTags = getElement(tagDiv);
+	var divAdminUsers = getElement(userDiv);
+	divAdminTags.style.display = "";
+	divAdminUsers.style.display = "none";
+	return true;
+}
 
-    <h3><?php echo T_("Flagged Users (bookmarks not visible to other users)"); ?></h3> 
-    <p><?php echo T_("Deleting users will remove their tags from the database.  While flagged, however, their tags will still be visible to everyone."); ?></p>
-    <table border="1" name="flagged_table">
-    <tr>
-        <th><?php echo T_("Username"); ?> </th>
-        <th><?php echo T_("Name"); ?> </th>
-        <th><?php echo T_("Email"); ?> </th>
-        <th><?php echo T_("IP Address"); ?> </th>
-        <th><?php echo T_("Homepage"); ?> </th>
-        <th><?php echo T_("uModified"); ?> </th>
-        <th><?php echo T_("uDatetime"); ?> </th>
-        <th><?php echo T_("Promote to Regular"); ?>  </th>
-        <th><?php echo T_("Delete from Database"); ?>  </th>
-    </tr>
+function validateModifyUsersForm(formId) {
+	var usersForm = getElement(formId);
+	if ( usersForm.modifyUsersAction.options[usersForm.modifyUsersAction.selectedIndex].value == "delete" ) {
+		var msg = "Are you sure that you want to permanently delete the selected users and all of their bookmarks and tags?";
+		if ( confirm(msg) ) {
+			var doModifyUsers = document.createElement('input');
+			doModifyUsers.setAttribute('type','hidden');
+			doModifyUsers.setAttribute('name','doModifyUsers');
+			usersForm.appendChild(doModifyUsers); 
+			usersForm.submit;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
 
-    <?php
-    $form_loop_count = 0;
-    foreach($ordered_users['flagged'] as $row)
-    {
-        echo "<tr>";
-        echo "<td>" . $row['username'] . '</td><td>' .
-        $row['name'] . '</td><td>' .
-        $row['email'] . '</td><td>' .
-        $row['uIp'] . '</td><td>' .
-        $row['homepage'] . '</td><td>' .
-        $row['uModified'] . '</td><td>' .
-        $row['uDatetime'] . "</td><td>" .
-        '<input type="radio" name="' . $row['username'] .
-        '" value="promote_to_regular' . 
-        '" /></td><td>' . 
-        '<input type="radio" name="' . $row['username'] .
-        '" value="delete_from_db'  .
-        "\"/></td></tr>\n";
-        $form_loop_count++;
-    }
-    ?>
-    </table>
-<br/>
-<input type="reset"value="<?php echo T_("Reset"); ?>"/> &nbsp;
-<input type="submit" value="<?php echo T_("Apply Changes"); ?>" /> 
-<br/>
-<h2> -- <?php echo T_("Tag Options"); ?> -- </h2>
-<?php echo T_("Change all tags with tag"); ?>&nbsp;
-<input type="text" name="merge_tag_from">&nbsp;
-<?php echo T_("to"); ?>&nbsp;
-<input type="text" name="merge_tag_to">&nbsp;
-<?php echo T_("and automatically convert when submitted"); ?>&nbsp;
-<input type="checkbox" name="merge_trigger_enable">&nbsp;
-<br/><br/>
-<input type="reset"value="<?php echo T_("Reset"); ?>"/> &nbsp;
-<input type="submit" value="<?php echo T_("Apply Changes"); ?>" /> 
-</form>
+</script>
 
-<?php
+<div style='margin-bottom: 1em;'>
+	<span style='font-size: large;'><a href='#' style='color: #000000;' onclick='showUsers("adminUsers", "adminTags");'>users</a></span> |
+	<span style='font-size: large;'><a href='#' style='color: #000000;' onclick='showTags("adminTags", "adminUsers");'>tags</a></span>
+</div>
+
+<hr />
+
+<div id='adminUsers'>
+	<form action='$formaction' method='post' id='frmUsers' onsubmit='return validateModifyUsersForm("frmUsers");'>
+		<table class='usersTable'>
+			<tr>
+				<th>[x]</th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=username'>Login</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=name'>Name</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=email'>Email</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=homepage'>Homepage</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uModified'>Modified</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uDatetime'>Registered</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uStatus'>Act.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=isFlagged'>Flg.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=isAdmin'>Adm.</a></th>
+			</tr>
+
+HTML;
+
+if ( isset($_REQUEST['sort']) ) {
+	$sort = $_REQUEST['sort'];
+} else {
+	$sort = "username";
+}
+
+$users = $userservice->getAllUsers($sort);
+foreach ( $users as $user ) {
+
+	# change the background color of the row depending on the user's status
+	# and also change bool status values to human readable ones
+	if ( $user['uStatus'] ) {
+		# user is activated
+		$bgColor = "bgGreen";
+		$user['uStatus'] = "Yes";
+	} else {
+		# user has registered but is not activated
+		$bgColor = "bgYellow";
+		$user['uStatus'] = "No";
+	}
+	if ( $user['isAdmin'] ) {
+		# user is an admin
+		$bgColor = "bgBlue";
+		$user['isAdmin'] = "Yes";
+	} else {
+		$user['isAdmin'] = "No";
+	}
+	if ( $user['isFlagged'] ) {
+		# user is flagged
+		$bgColor = "bgRed";
+		$user['isFlagged'] = "Yes";
+	} else {
+		$user['isFlagged'] = "No";
+	}
+
+	echo <<<HTML
+			<tr class='$bgColor'>
+				<td><input type='checkbox' name='userList[]' value='{$user['uId']}' /></td>
+				<td>{$user['username']}</td>
+				<td>{$user['name']}</td>
+				<td>{$user['email']}</td>
+				<td>{$user['homepage']}</td>
+				<td>{$user['uModified']}</td>
+				<td>{$user['uDatetime']}</td>
+				<td style='text-align: center;'>{$user['uStatus']}</td>
+				<td style='text-align: center;'>{$user['isFlagged']}</td>
+				<td style='text-align: center;'>{$user['isAdmin']}</td>
+			</tr>
+
+HTML;
+}
+
+echo <<<HTML
+		</table>
+		<div style='margin-top: 1em;'>
+			<span>Perform the following action on the selected users:</span>
+			<select name='modifyUsersAction'>
+				<option value='activate'>Activate</option>
+				<option value='deactivate'>Deactivate</option>
+				<option value='flag'>Flag</option>
+				<option value='unflag'>Unflag</option>
+				<option value='makeAdmin'>Make Admin</option>
+				<option value='yankAdmin'>Yank Admin</option>
+				<option value='delete'>Delete</option>
+			</select>
+			<input type='submit' name='doModifyUsers' value='Submit' /> 
+		</div>
+	</form>
+	<div style='margin-top: 1em;'>
+		<div style='float: left;'>Color legend:&nbsp;</div>
+		<div class='bgBlue' style='padding-left: .5ex; padding-right: .5ex; float: left;'>Admin</div>
+		<div class='bgGreen' style='padding-left: .5ex; padding-right: .5ex; float: left;'>Activated</div>
+		<div class='bgYellow' style='padding-left: .5ex; padding-right: .5ex; float: left;'>Not activated</div>
+		<div class='bgRed' style='padding-left: .5ex; padding-right: .5ex; float: left;'>Flagged</div>
+	</div>
+</div>
+
+
+<div id='adminTags' style='display: none;'>
+	<form action='$formaction' method='post'>
+		Change all tags with tag <input type='text' name='merge_tag_from'> to <input type='text' name='merge_tag_to'>
+		<input type='submit' name='doModifyTags' value='Apply Changes' /><br /><br />
+		Automatically make this conversion for new tags? <input type='checkbox' name='merge_trigger_enable'>
+	</form>
+</div>
+
+HTML;
+
 $this->includeTemplate($GLOBALS['bottom_include']);
+
 ?>
+

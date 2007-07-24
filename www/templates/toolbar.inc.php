@@ -10,6 +10,13 @@ if ($userservice->isLoggedOn()) {
         <li><a href="<?php echo createURL('bookmarks', $cUsername); ?>"><?php echo T_('My Bookmarks'); ?></a></li>
         <li><a href="<?php echo createURL('watchlist', $cUsername); ?>"><?php echo T_('Watchlist'); ?></a></li>
         <li><a href="<?php echo createURL('bookmarks', $cUsername . '?action=add'); ?>"><?php echo T_('Add a Bookmark'); ?></a></li>
+<?php
+	
+if ( $isAdmin ) {
+	echo "	<li>[<a href='{$GLOBALS['root']}admin.php'>" . T_('Admin') . "</a>]</li>\n";
+}
+
+?>
         <li class="access">
           <ul>
             <li><strong><?= $cUsername ?>:</strong>&nbsp;</li>
@@ -17,9 +24,6 @@ if ($userservice->isLoggedOn()) {
             <li><a href="<?php echo $GLOBALS['root']; ?>?action=logout"><?php echo T_('Log Out'); ?></a></li>
           </ul>
         </li>
-        <?php if ($isAdmin): ?>
-        &mdash; <a href="<?php echo $GLOBALS['root']; ?>admin.php"><?php echo T_('Admin'); ?></a>
-        <?php endif; ?>
     </ul>
 
 <?php

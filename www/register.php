@@ -68,12 +68,38 @@ if ($_POST['submitted']) {
 
     // Register details
     } elseif ($userservice->addUser($posteduser, $_POST['password'], $_POST['email'])) {
+		/* Send the user an activation email */
+
+
+    	#$newUser = $userservice->getUserByUsername($posteduser)) {
+		# make a, hopefully, unique activation key based on an md5 hash of the 
+		# users id and username
+		$activationKey =  md5("{$newUser['uId']}-{$newUser['username']}");
+		$activationUrl = "http://{$_SERVER_NAME}/$root/activate.php?key=$activationKey')";
+		$rcptTo = $_POST['email'];
+		$subject = "Activation you new account at ccLearn - OER Cloud";
+		$message = <<<MSG
+
+Thank you for registering at ccLearn's OER Cloud.
+
+Your account has been created, but you must activate your account by visiting the following link.
+Alternatively, you can paste this address into your browser's address bar.
+
+$activationUrl
+
+MSG;
+
+		mail($rcptTo,$subject,$message);
+
+
         // Log in with new username
+		/*
         $login = $userservice->login($posteduser, $_POST['password']);
         if ($login) {
             header('Location: '. createURL('bookmarks', $posteduser));
         }
         $tplVars['msg'] = T_('You have successfully registered. Enjoy!');
+		 */
     } else {
         $tplVars['error'] = T_('Registration failed. Please try again.');
     }
