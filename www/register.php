@@ -86,8 +86,10 @@ if ($_POST['submitted']) {
 			$posteduser
 		);
 		$userservice->db->sql_query($sql);
+
 		$rcptTo = $_POST['email'];
 		$subject = "Activate your new account at ccLearn's OER Cloud";
+		$headers = "From: ccLearn Webmaster <webmaster@creativecommons.org>";
 		$message = <<<MSG
 You have received this email because someone registered at http://oercloud.creativecommons.org using
 this email address.  If this was not you, then please disregard this message, otherwise visit the
@@ -101,7 +103,7 @@ Thank you for your interest in ccLearn,
 The ccLearn Team.
 MSG;
 
-		mail($rcptTo,$subject,$message);
+		mail($rcptTo, $subject, $message, $headers);
         $tplVars['msg'] = "You were successfully registered, but you still need to activate the account.  Please check your email for a confirmation.";
     } else {
         $tplVars['error'] = T_('Registration failed. Please try again.');

@@ -23,7 +23,7 @@ if ( isset($_GET['key']) && ! empty($_GET['key']) ) {
 				$user['uId']
 			);
 			if ( $qid = $userservice->db->sql_query($sql) ) {
-				$tplVars['msg'] = "Thank you.  Your account has been activated.  You may now <a href='{$GLOBALS['root'}login/'>login</a>.";
+				$tplVars['msg'] = "Thank you.  Your account has been activated.  You may now <a href='{$GLOBALS['root']}login/'>login</a>.";
 			} else {
 				$tplVars['error'] = "There was an error activating your account.  Please contact the site administrator.";
 			}
