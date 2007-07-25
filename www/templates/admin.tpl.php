@@ -9,49 +9,6 @@ if ( ! empty($updateResults) ) {
 }
 
 echo <<<HTML
-<script type='text/javascript'>
-
-function getElement(elemid) {
-	/* the former for Firefox and crew, the latter for IE */
-	return (document.getElementById) ? document.getElementById(elemid) : document.all[elemid];
-}
-
-function showUsers(userDiv,tagDiv) {
-	var divAdminUsers = getElement(userDiv);
-	var divAdminTags = getElement(tagDiv);
-	divAdminUsers.style.display = "";
-	divAdminTags.style.display = "none";
-	return true;
-}
-
-function showTags(tagDiv,userDiv) {
-	var divAdminTags = getElement(tagDiv);
-	var divAdminUsers = getElement(userDiv);
-	divAdminTags.style.display = "";
-	divAdminUsers.style.display = "none";
-	return true;
-}
-
-function validateModifyUsersForm(formId) {
-	var usersForm = getElement(formId);
-	if ( usersForm.modifyUsersAction.options[usersForm.modifyUsersAction.selectedIndex].value == "delete" ) {
-		var msg = "Are you sure that you want to permanently delete the selected users and all of their bookmarks and tags?";
-		if ( confirm(msg) ) {
-			var doModifyUsers = document.createElement('input');
-			doModifyUsers.setAttribute('type','hidden');
-			doModifyUsers.setAttribute('name','doModifyUsers');
-			usersForm.appendChild(doModifyUsers); 
-			usersForm.submit;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	return true;
-}
-
-</script>
-
 <div style='margin-bottom: 1em;'>
 	<span style='font-size: large;'><a href='#' style='color: #000000;' onclick='showUsers("adminUsers", "adminTags");'>users</a></span> |
 	<span style='font-size: large;'><a href='#' style='color: #000000;' onclick='showTags("adminTags", "adminUsers");'>tags</a></span>
@@ -70,9 +27,10 @@ function validateModifyUsersForm(formId) {
 				<th><a href='{$_SERVER['PHP_SELF']}?sort=homepage'>Homepage</a></th>
 				<th><a href='{$_SERVER['PHP_SELF']}?sort=uModified'>Modified</a></th>
 				<th><a href='{$_SERVER['PHP_SELF']}?sort=uDatetime'>Registered</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=uStatus'>Act.</a></th>
 				<th><a href='{$_SERVER['PHP_SELF']}?sort=isFlagged'>Flg.</a></th>
 				<th><a href='{$_SERVER['PHP_SELF']}?sort=isAdmin'>Adm.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uStatus'>Act.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=activation_key'>Act.Key</a></th>
 			</tr>
 
 HTML;
@@ -112,6 +70,11 @@ foreach ( $users as $user ) {
 		$user['isFlagged'] = "No";
 	}
 
+	# break apart the date and time so that we can display the short date in the 
+	# crowded table, and yet still show the date and time with a popup title.
+	list($dateRegistered, $timeRegistered) = explode(" ", $user['uDatetime']);
+	list($dateModified, $timeModified) = explode(" ", $user['uModified']);
+
 	echo <<<HTML
 			<tr class='$bgColor'>
 				<td><input type='checkbox' name='userList[]' value='{$user['uId']}' /></td>
@@ -119,11 +82,12 @@ foreach ( $users as $user ) {
 				<td>{$user['name']}</td>
 				<td>{$user['email']}</td>
 				<td>{$user['homepage']}</td>
-				<td>{$user['uModified']}</td>
-				<td>{$user['uDatetime']}</td>
-				<td style='text-align: center;'>{$user['uStatus']}</td>
+				<td><span title='$dateModified $timeModified'>$dateModified</span></td>
+				<td><span title='$dateRegistered $timeRegistered'>$dateRegistered</span></td>
 				<td style='text-align: center;'>{$user['isFlagged']}</td>
 				<td style='text-align: center;'>{$user['isAdmin']}</td>
+				<td style='text-align: center;'>{$user['uStatus']}</td>
+				<td style='text-align: center;'>{$user['activation_key']}</td>
 			</tr>
 
 HTML;

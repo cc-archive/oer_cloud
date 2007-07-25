@@ -26,7 +26,7 @@ if(isset($_GET['popup'])) {
 ?>
 
 <div id="header"<?php echo $headerstyle; ?>>
-    <h1><a href="http://learn.creativecommons.org"><span><img src="<?= $GLOBALS['root'] ?>images/cc-learn.png" alt="cc learn"/></span></a></h1>
+	<h1><a href="<?php echo $GLOBALS['root']; ?>"><span><img src="<?= $GLOBALS['root'] ?>images/cc-learn.png" alt="cc learn"/></span></a></h1>
     <?php
     if(!isset($_GET['popup'])) {
         $this->includeTemplate('toolbar.inc');

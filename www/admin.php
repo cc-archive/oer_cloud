@@ -52,30 +52,10 @@ else {
 		$userservice->modifyTags();
 	}
 
-	/*
-    if(0 < count($_POST)) { 
-        // at least one variable was POSTed
-        $paaResult = $userservice->performAdminActions($_POST);
-        switch($paaResult[0]) {
-            case 0: 
-                // keeping the T_ in case 0 (and not just the error msg)
-                // for translation purposes
-                $tplVars['error'] = T_('An error occurred with the requested actions: ') 
-                    . $paaResult[1]; 
-                break;
-            case 1:
-                $tplVars['error'] = T_('Your changes were sucessfully made'); 
-                break;
-            case 2:
-                $tplVars['error'] = T_('No action was taken');
-                break;
-        }
-    }
-	*/
-
     if($userservice->isAdminPassDefault($current_user['username'])) {
         $tplVars['error'] .= " PLEASE CHANGE THE ADMIN DEFAULT PASSWORD!";
     }
+	$tplVars['loadjs'] = true;
     $tplVars['currentUsername'] = $current_user['username'];
     $tplVars['isLoggedOn'] = true;
     $tplVars['isAdmin'] = true;

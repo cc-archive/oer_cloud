@@ -199,86 +199,6 @@ class UserService {
         return false;
     }
 
-    function getUsersByCategory() {
-        $query = 'SELECT * FROM sc_users ORDER BY isAdmin DESC, isFlagged, username';
-        if (! ($dbresult =& $this->db->sql_query($query)) ) {
-            message_die(GENERAL_ERROR, 'Could not get user', '', __LINE__, __FILE__, $query, $this->db);
-            return false;
-            }
-        $ordered_users = array(
-            'admins' => array(),
-            'registered' => array(),
-            'unregistered' => array(),
-            'flagged' => array()
-        );
-        while ($row = $this->db->sql_fetchrow($dbresult)) {
-            if($row['isAdmin']) { // administrator
-                array_push($ordered_users['admins'], $row);
-            }
-            else if (!$row['uStatus']) { // unregistred user
-                array_push($ordered_users['unregistered'], $row);
-            }
-            else if (!$row['isFlagged']) { //registered user
-                array_push($ordered_users['registered'], $row);
-            }
-            else { // flagged user
-                array_push($ordered_users['flagged'], $row);
-            }
-        }
-        return $ordered_users;
-    }
-
-    function deleteUserByUsername($username)
-    {
-        $username = $this->safeString($username);
-        $u = $this->_getuser($this->getFieldName('username'), $username);;
-        $uId = $u['uId'];
-        // don't really understand watchlist thing...
-        // $d_query0 = "DELETE FROM sc_watched WHERE uId = ".$uId;
-
-        // first, delete the user's tags
-        // 1. get the user's tags
-        $query = "SELECT DISTINCT u.uId, b.bId, t.id, t.tag 
-            FROM sc_users AS u, sc_bookmarks AS b, sc_tags AS t 
-            WHERE u.uId = b.uId AND b.bId = t.bId AND u.uId = " . $uId;
-        if (! ($dbresult =& $this->db->sql_query($query)) ) {
-            message_die(GENERAL_ERROR, 'Could not perform action', '', 
-                __LINE__, __FILE__, $query, $this->db);
-            return false;
-            }
-        // 2. put them into a string (for the sql)
-        $idString = "(";
-        while($row = mysql_fetch_array($dbresult)) { 
-             $idString .= $row['id'] . ",";
-            }
-        $idString[strlen($idString)-1] = ')';
-
-        // 3. then delete the tags
-        $query = "DELETE FROM sc_tags WHERE id IN " . $idString;
-        if (! ($dbresult =& $this->db->sql_query($query)) ) { 
-            message_die(GENERAL_ERROR, 'Could not perform action', '', 
-                __LINE__, __FILE__, $query, $this->db);
-            return false;
-            }
-
-        // then delete the user's bookmarks
-        $query = "DELETE FROM sc_bookmarks WHERE uId = ".$uId;
-        if (! ($dbresult =& $this->db->sql_query($query)) ) {
-            message_die(GENERAL_ERROR, 'Could not perform action', '', 
-                __LINE__, __FILE__, $query, $this->db);
-            return false;
-            }
-
-        // finally, delete the user
-        $query = "DELETE FROM sc_users WHERE uId = '". $uId . "'";
-        if (! ($dbresult =& $this->db->sql_query($query)) ) {
-            message_die(GENERAL_ERROR, 'Could not perform action', '', 
-                __LINE__, __FILE__, $query, $this->db);
-            return false;
-            }
-        return true;
-    }
-
     function safeString($string) {
         if(get_magic_quotes_gpc()){
             if(ini_get('magic_quotes_sybase')) 
@@ -288,96 +208,6 @@ class UserService {
         }
         $more_safe = mysql_real_escape_string($safe);
         return $more_safe;
-    }
-
-    function performAdminActions($usersTOactions) {
-        $changeFlag = false;
-        foreach(array_keys($usersTOactions) as $i) {
-            if(strlen($i) > 25) 
-                return array(0, "Unrecognized username");
-            $executeAtBottom = true;
-            switch ($usersTOactions[$i]) {
-                case "revoke_admin_access":
-                    $i = $this->safeString($i);
-                    $query = sprintf("UPDATE sc_users SET isAdmin = 0 WHERE username = '%s'", $i);
-                    break;
-                case "promote_to_admin":
-                    $i = $this->safeString($i);
-                    $query = sprintf("UPDATE sc_users SET isAdmin = 1 WHERE username = '%s'", $i);
-                    break;
-                case "flag":
-                    $i = $this->safeString($i);
-                    $query = sprintf("UPDATE sc_users SET isFlagged = 1 WHERE username = '%s'", $i);
-                    break;
-                case "promote_to_regular":
-                    $i = $this->safeString($i);
-                    $query = sprintf("UPDATE sc_users SET isFlagged = 0 WHERE username = '%s'", $i);
-                    break;
-                case "approve_registration":
-                    $i = $this->safeString($i);
-                    $query = sprintf("UPDATE sc_users SET uStatus = 1 WHERE username = '%s'", $i);
-                    break;
-                case "delete_from_db":
-                    $delResult = $this->deleteUserByUsername($i);
-                    if(!$delResult[0]) {
-                        return $delResult;
-                    }
-                    $changeFlag = true;
-                    $executeAtBottom = false;
-                    break;
-                default: // handle tags and errors
-                    switch($i){
-                        case "merge_tag_from":
-                            if($usersTOactions['merge_tag_from']) {
-                                if ($usersTOactions['merge_tag_to']) { //both filled out
-                                    /* Begin SQL Injection prevention */
-                                    $merge_tag_to = $this->safeString($usersTOactions['merge_tag_to']);
-                                    $merge_tag_from = $this->safeString($usersTOactions['merge_tag_from']);
-                                    if(strlen($merge_tag_to) > 30 or strlen($merge_tag_from) > 30)
-                                        return array(0, "Please shorten your tag lengths");
-                                    $query = sprintf("UPDATE sc_tags SET tag = '%s' WHERE tag = '%s'",
-                                            $merge_tag_to, $merge_tag_from);
-                                    if ($usersTOactions['merge_trigger_enable']) {
-                                        $tagservice =& ServiceFactory::getServiceInstance('TagService');
-                                        if(!$tagservice->addEntryToTagMap($usersTOactions['merge_tag_from'],
-                                            $usersTOactions['merge_tag_to']))
-                                            return array(0, "Tagmap addition failed! (perhaps it can't find the tagmap.array file?)"); 
-                                    }
-                                }
-                                else {
-                                    return array(0, "Please fill out both textboxes, not just one");
-                                }
-                            } elseif ($usersTOactions['merge_tag_to']) { 
-                                return array(0, "Please fill out both textboxes, not just one");
-                            } else {
-                                $executeAtBottom = false;
-                            }
-                            break;
-                        case "merge_tag_to":
-                            $executeAtBottom = false;
-                            break;
-                        case "merge_trigger_enable":
-                            if(!($usersTOactions['merge_tag_from'] and $usersTOactions['merge_tag_to']))
-                                return array(0, "Please specify the tag conversion you wish to automate");
-                            $executeAtBottom = false;
-                            break;
-                        default:
-                            return array(0, "Error in switch");
-                    } // inner switch
-                } // outter switch
-
-            if ($executeAtBottom) {
-                if(!($dbresult =& $this->db->sql_query($query)) ) {
-                    message_die(GENERAL_ERROR, 'Could not perform action', '', 
-                        __LINE__, __FILE__, $query, $this->db);
-                    return array(0, "FAILED QUERY: " . $query);
-                }
-                else $changeFlag = true;
-            }
-
-        } // foreach
-        if($changeFlag) return array(1, );
-        else return array(2, );
     }
 
     function isAdminPassDefault($adminUser) {
@@ -690,7 +520,7 @@ class UserService {
     function setCookieKey($value) { $this->cookiekey = $value; }
 
 
-	/**select box
+	/**
 	 *
 	 * Functions added by Nathan Kinkade
 	 *
@@ -742,67 +572,85 @@ class UserService {
 			switch ( $_POST['modifyUsersAction'] ) {
 				case "activate":
 					$sql = sprintf ("
-						UPDATE %susers SET uStatus = '1'
+						UPDATE %susers SET
+							uStatus = '1',
+							uModified = '%s'
 						WHERE %s IN ($userIds)
 						",
 						$GLOBALS['tableprefix'], 
+        				gmdate('Y-m-d H:i:s', time()),
 						$this->fields['primary']
 					);
 					$actionMsg = "Activating the selected user(s)";
 					break;
 				case "deactivate":
 					$sql = sprintf ("
-						UPDATE %susers SET uStatus = '0'
+						UPDATE %susers SET
+							uStatus = '0',
+							uModified = '%s'
 						WHERE %s IN ($userIds)
 						",
 						$GLOBALS['tableprefix'], 
+        				gmdate('Y-m-d H:i:s', time()),
 					   	$this->fields['primary']
 					);
 					$actionMsg = "Deactivating the selected user(s)";
 					break;
 				case "flag":
 					$sql = sprintf ("
-						UPDATE %s SET isFlagged = '1'
+						UPDATE %susers SET
+							isFlagged = '1',
+							uModified = '%s'
 						WHERE %s IN ($userIds)
 						",
 						$GLOBALS['tableprefix'], 
+        				gmdate('Y-m-d H:i:s', time()),
 						$this->fields['primary']
 					);
 					$actionMsg = "Flagging the selected user(s)";
 					break;
 				case "unflag":
 					$sql = sprintf ("
-						UPDATE %s SET isFlagged = '0'
+						UPDATE %susers SET
+					   		isFlagged = '0',
+							uModified = '%s'
 						WHERE %s IN ($userIds)
 						",
 						$GLOBALS['tableprefix'], 
+        				gmdate('Y-m-d H:i:s', time()),
 						$this->fields['primary']
 					);
 					$actionMsg = "Unflagging the selected user(s)";
 					break;
 				case "makeAdmin":
 					$sql = sprintf ("
-						UPDATE %s SET isAdmin = '1'
+						UPDATE %susers SET
+					   		isAdmin = '1',
+							uModified = '%s'
 						WHERE %s IN ($userIds)
 						",
-						$GLOBALS['tableprefix'], 
+						$GLOBALS['tableprefix'],
+        				gmdate('Y-m-d H:i:s', time()),
 						$this->fields['primary']
 					);
 					$actionMsg = "Granting admin privileges to the selected user(s)";
 					break;
 				case "yankAdmin":
 					$sql = sprintf ("
-						UPDATE %s SET isAdmin = '0'
+						UPDATE %susers SET
+							isAdmin = '0',
+							uModified = '%s'
 						WHERE %s IN ($userIds)
 						",
 						$GLOBALS['tableprefix'], 
+        				gmdate('Y-m-d H:i:s', time()),
 						$this->fields['primary']
 					);
 					$actionMsg = "Revoking admin privileges from the selected user(s)";
 					break;
 				case "delete":
 					$sql = sprintf ("
-						DELETE %susers.*, %sbookmarks.*, %sstags.*
+						DELETE %susers.*, %sbookmarks.*, %stags.*
 						FROM %susers LEFT JOIN %sbookmarks
 							ON %susers.%s = %sbookmarks.%s
 						LEFT JOIN %stags
@@ -826,6 +674,7 @@ class UserService {
 						$userIds
 					);
 					$actionMsg = "Deleting the selected user(s)";
+					break;
 				default:
 					$sql = "";
 					$tplVars['error'] = "Unrecognized action. No changes were made.";

@@ -488,12 +488,9 @@ ul {
 	width: 75%;
 }
 
-/* ADMIN */
-table.usersTable {
-	width: 100%;
-	border: 1px solid grey;
-}
-
+/* 
+ * Added by Nathan Kinkade
+ */
 .bgDark {
 	background: #e0e0e0;
 }
@@ -516,6 +513,12 @@ table.usersTable {
 
 .bgRed {
 	background: #ff9c8c;
+}
+
+table.usersTable {
+	width: 100%;
+	border: 1px solid grey;
+	margin: 0;
 }
 
 table.usersTable td {

@@ -62,6 +62,10 @@ if ($_POST['submitted']) {
     } elseif ($userservice->getUserByUsername($posteduser)) {
         $tplVars['error'] = T_('This username already exists, please make another choice.');
     
+	// Check if password is at least 6 chars
+	} elseif ( strlen($_POST['password']) < 6 ) {
+        $tplVars['error'] = T_('Password must be at least 6 characters long.');
+
     // Check if e-mail address is valid
     } elseif (!$userservice->isValidEmail($_POST['email'])) {
         $tplVars['error'] = T_('E-mail address is not valid. Please try again.');
@@ -70,36 +74,35 @@ if ($_POST['submitted']) {
     } elseif ($userservice->addUser($posteduser, $_POST['password'], $_POST['email'])) {
 		/* Send the user an activation email */
 
-
-    	#$newUser = $userservice->getUserByUsername($posteduser)) {
-		# make a, hopefully, unique activation key based on an md5 hash of the 
-		# users id and username
-		$activationKey =  md5("{$newUser['uId']}-{$newUser['username']}");
-		$activationUrl = "http://{$_SERVER_NAME}/$root/activate.php?key=$activationKey')";
+		# user the codes existing function for creating random password to create a 
+		# hopefully random activation key and then insert it into the users record
+		$activationKey = $userservice->_randompassword();
+		$activationUrl = "http://{$_SERVER['SERVER_NAME']}{$root}activate/?key=$activationKey";
+		$sql = sprintf ("
+			UPDATE %susers SET activation_key = '$activationKey'
+			WHERE username = '%s'
+			",
+			$GLOBALS['tableprefix'],
+			$posteduser
+		);
+		$userservice->db->sql_query($sql);
 		$rcptTo = $_POST['email'];
-		$subject = "Activation you new account at ccLearn - OER Cloud";
+		$subject = "Activate your new account at ccLearn's OER Cloud";
 		$message = <<<MSG
-
-Thank you for registering at ccLearn's OER Cloud.
-
-Your account has been created, but you must activate your account by visiting the following link.
-Alternatively, you can paste this address into your browser's address bar.
+You have received this email because someone registered at http://oercloud.creativecommons.org using
+this email address.  If this was not you, then please disregard this message, otherwise visit the
+following link to activate your account. You can also paste this address into your browser's
+address bar if your email program does not allow you to click on links.
 
 $activationUrl
 
+Thank you for your interest in ccLearn,
+
+The ccLearn Team.
 MSG;
 
 		mail($rcptTo,$subject,$message);
-
-
-        // Log in with new username
-		/*
-        $login = $userservice->login($posteduser, $_POST['password']);
-        if ($login) {
-            header('Location: '. createURL('bookmarks', $posteduser));
-        }
-        $tplVars['msg'] = T_('You have successfully registered. Enjoy!');
-		 */
+        $tplVars['msg'] = "You were successfully registered, but you still need to activate the account.  Please check your email for a confirmation.";
     } else {
         $tplVars['error'] = T_('Registration failed. Please try again.');
     }
@@ -109,4 +112,5 @@ $tplVars['loadjs']      = true;
 $tplVars['subtitle']    = T_('Register');
 $tplVars['formaction']  = createURL('register');
 $templateservice->loadTemplate('register.tpl', $tplVars);
+
 ?>

@@ -113,11 +113,14 @@ if ($loggedon && isset($_POST['submitted'])) {
                     $tplVars['msg'] = '<script type="text/javascript">window.close();</script>';
                 } else {
                     $tplVars['msg'] = T_('Bookmark saved');
+                	$templatename = 'bookmarks.tpl';
                     // Redirection option
+					/*
                     if ($GLOBALS['useredir']) {
                         $address = $GLOBALS['url_redir'] . $address;
                     }
                     header('Location: '. $address);
+					 */
                 }
             } else {
                 $tplVars['error'] = T_('There was an error saving your bookmark. Please try again or contact the administrator.');
