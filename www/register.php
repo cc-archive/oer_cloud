@@ -77,7 +77,7 @@ if ($_POST['submitted']) {
 		# user the codes existing function for creating random password to create a 
 		# hopefully random activation key and then insert it into the users record
 		$activationKey = $userservice->_randompassword();
-		$activationUrl = "http://{$_SERVER['SERVER_NAME']}{$root}activate/?key=$activationKey";
+		$activationUrl = "{$root}activate/?key=$activationKey";
 		$sql = sprintf ("
 			UPDATE %susers SET activation_key = '$activationKey'
 			WHERE username = '%s'

@@ -140,7 +140,6 @@ function playerLoad() {
     }
 }
 
-<!-- Functions added by Nathan Kinkade -->
 
 function getElement(elemid) {
 	/* the former for Firefox and crew, the latter for IE */
@@ -171,7 +170,7 @@ function validateModifyUsersForm(formId) {
 			var doModifyUsers = document.createElement('input');
 			doModifyUsers.setAttribute('type','hidden');
 			doModifyUsers.setAttribute('name','doModifyUsers');
-			usersForm.appendChild(doModifyUsers); 
+			usersForm.appendChild(doModifyUsers);
 			usersForm.submit;
 			return true;
 		} else {
@@ -179,4 +178,41 @@ function validateModifyUsersForm(formId) {
 		}
 	}
 	return true;
+}
+
+// allows logged in users to "flag" a bookmark.  this calls the file
+// ajaxFlagBookmark.php, which itself calls function flagBookmark()
+// located in bookmarkservice.php
+function flagBookmark(bid, response) {
+
+	if ( response != "" ) {
+		// the left side is the bookmark id, the right is the status
+		responseVars = response.split(":");
+		var spanFlagStatus = getElement("flagStatus-" + responseVars[0]);
+		if ( responseVars[1] == "invalid" ) {
+			alert("The specified bookmark is not valid.");
+		} else if ( responseVars[1] == "noUpdate" ) {
+			alert("The specified bookmark was not found.");
+		} else if ( responseVars[1] == "alreadyFlagged" ) {
+			alert("You have already flagged this bookmark.");
+		} else if ( responseVars[1] == "notLoggedIn" ) {
+			alert("You must be logged in to tag a bookmark.");
+		} else {
+			// if we got here then the response should be the flagCount
+			// but check anyway
+			if ( isNaN(responseVars[1]) ) { 
+				alert("There was an error. The bookmark may not have been flagged.");
+			} else {
+				spanFlagStatus.innerHTML = " (flags: " + responseVars[1] + ")";
+			}
+		}
+	} else {
+		var msg = "Do you really want to flag this bookmark?  Flag a bookmark only when you think it's content is either irrelevant or inappropriate.";
+		if ( confirm(msg) ) {
+			loadXMLDoc('<?php echo $root; ?>ajaxFlagBookmark.php?bId=' + bid);
+		} else {
+			return false;
+		}
+	}
+
 }

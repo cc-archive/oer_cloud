@@ -48,6 +48,7 @@ window.onload = playerLoad;
         }
 
         $cats = '';
+		$flags = "";
         $tags = $row['tags'];
         foreach(array_keys($tags) as $key) {
             $tag =& $tags[$key];
@@ -100,6 +101,27 @@ window.onload = playerLoad;
             $rel = ' rel="nofollow"';
         }
 
+		// Flag option
+		$sql = sprintf ("
+			SELECT bFlagCount FROM %sbookmarks
+			WHERE bId = '%s'
+			",
+			$GLOBALS['tableprefix'],
+			$row['bId']
+		);
+		$qid = $bookmarkservice->db->sql_query($sql);
+		$rowFlagCount = $bookmarkservice->db->sql_fetchrow($qid);
+		$flagCount = "";
+		if ( $rowFlagCount['bFlagCount'] != 0 ) {
+			$flagCount = " (flags: {$rowFlagCount['bFlagCount']})";
+		}
+		# Only users who are logged in can flag bookmarks
+		if ( $userservice->isLoggedOn() ) {
+			$flags = "- <a href='' onclick='flagBookmark(\"{$row['bId']}\", \"\"); return false;' title='Flag this bookmark'>flag</a>\n";
+		}
+		# Everyone can see how many times a bookmark has been flagged
+		$flags .= "<span id='flagStatus-{$row['bId']}'>$flagCount</span>\n";
+
         $address = filter($row['bAddress']);
         
         // Redirection option
@@ -113,7 +135,7 @@ window.onload = playerLoad;
         if ($row['bDescription'] != '') {
             echo '<div class="description">'. filter($row['bDescription']) ."</div>\n";
         }
-        echo '<div class="meta">'. date($GLOBALS['shortdate'], strtotime($row['bDatetime'])) . $cats . $copy . $edit ."</div>\n";
+        echo '<div class="meta">'. date($GLOBALS['shortdate'], strtotime($row['bDatetime'])) . $cats . $copy . $edit . $flags ."</div>\n";
         echo "</li>\n";
     }
     ?>

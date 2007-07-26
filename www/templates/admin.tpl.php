@@ -21,16 +21,16 @@ echo <<<HTML
 		<table class='usersTable'>
 			<tr>
 				<th>[x]</th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=username'>Login</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=name'>Name</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=email'>Email</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=homepage'>Homepage</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=uModified'>Modified</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=uDatetime'>Registered</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=isFlagged'>Flg.</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=isAdmin'>Adm.</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=uStatus'>Act.</a></th>
-				<th><a href='{$_SERVER['PHP_SELF']}?sort=activation_key'>Act.Key</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=username' title='Sort by username'>Username</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=name' title='Sort by name'>Name</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=email' title='Sort by email'>Email</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=homepage' title='Sort by homepage'>Homepage</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uModified' title='Sort by modification date'>Modified</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uDatetime' title='Sort by registration date'>Registered</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=isFlagged' title='Sort by flagged status'>Flg.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=isAdmin' title='Sort by admin status'>Adm.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=uStatus' title='Sort by activation status'>Act.</a></th>
+				<th><a href='{$_SERVER['PHP_SELF']}?sort=activation_key' title='Sort by activation key'>Act.Key</a></th>
 			</tr>
 
 HTML;

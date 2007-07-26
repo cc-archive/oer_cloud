@@ -413,5 +413,79 @@ class BookmarkService {
         }
         return $this->db->sql_fetchfield(0, 0) - 1;
     }
+
+
+
+	/*
+	 * Functions added Nathan Kinkade
+	 */
+
+	function flagBookmark($bId) {
+		
+		if ( ! empty($bId) && is_numeric($bId) ) {
+	
+			# get the current users ID.  if for some reason they got here and are
+			# not actually logged in, then just reject the request
+            $userservice = & ServiceFactory :: getServiceInstance('UserService');
+			if ( ! $currentUserId = $userservice->getCurrentUserid() ) {
+				return "notLoggedIn";
+			}
+
+			# first we make sure that this user hasn't already flagged this bookmark
+			$sql = sprintf ("
+				SELECT bFlaggedBy FROM %sbookmarks
+				WHERE bId = '%s'
+				",
+				$GLOBALS['tableprefix'],
+				$bId
+			);
+			$qid = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($qid);
+			$flaggedBy = explode(":", $row['bFlaggedBy']);
+
+			if ( $flaggedBy && in_array($currentUserId, $flaggedBy) ) {
+				# if they have already flagged it, then stop here
+				return "alreadyFlagged";
+			} else {
+				# update the flag count by one and add this user to the list of users
+				# who have flagged this bookmark
+				$sql = sprintf ("
+					UPDATE %sbookmarks SET
+						bFlagCount = (bFlagCount + 1),
+						bFlaggedBy = CONCAT(IFNULL(bFlaggedBy,''),':','%s')
+					WHERE bId = '%s'
+					",
+					$GLOBALS['tableprefix'],
+					$currentUserId,
+					$bId
+				);
+				$qid = $this->db->sql_query($sql);
+				# 1 record should have been updated, if not, then the most likely
+				# cause was a bad bookmark Id, but it could have been a db error
+				if ( 1 == $this->db->sql_affectedrows($qid) ) {
+					$sql = sprintf ("
+						SELECT bFlagCount FROM %sbookmarks
+						WHERE bId = '%s'
+						",
+						$GLOBALS['tableprefix'],
+						$bId
+					);
+					$qid = $this->db->sql_query($sql);
+					$row = $this->db->sql_fetchrow($qid);
+					return $row['bFlagCount'];
+				} else {
+					return "noUpdate";
+				}
+			}
+		} else {
+			# if the bookmark id was null or not a number, then something went
+			# very wrong
+			return "invalid";
+		}
+
+	}
+
+
 }
+
 ?>
