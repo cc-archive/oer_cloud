@@ -13,7 +13,7 @@ if ($userservice->isLoggedOn()) {
 <?php
 	
 if ( $isAdmin ) {
-	echo "	<li>[<a href='{$GLOBALS['root']}admin.php'>" . T_('Admin') . "</a>]</li>\n";
+	echo "	<li>[<a href='{$GLOBALS['root']}admin/'>" . T_('Admin') . "</a>]</li>\n";
 }
 
 ?>

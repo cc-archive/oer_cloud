@@ -117,7 +117,7 @@ window.onload = playerLoad;
 		}
 		# Only users who are logged in can flag bookmarks
 		if ( $userservice->isLoggedOn() ) {
-			$flags = "- <a href='' onclick='flagBookmark(\"{$row['bId']}\", \"\"); return false;' title='Flag this bookmark'>flag</a>\n";
+			$flags = "- <a href='' onclick='flagBookmark(\"{$row['bId']}\", \"\"); return false;' title='Flag this bookmark'>Flag</a>\n";
 		}
 		# Everyone can see how many times a bookmark has been flagged
 		$flags .= "<span id='flagStatus-{$row['bId']}'>$flagCount</span>\n";

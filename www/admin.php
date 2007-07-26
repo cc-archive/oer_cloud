@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 require_once('header.inc.php');
 
 $userservice =& ServiceFactory::getServiceInstance('UserService');
+$bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
 $templateservice =& ServiceFactory::getServiceInstance('TemplateService');
 $current_user = $userservice->getCurrentUser();
 
@@ -48,8 +49,10 @@ else {
 
 	if ( isset($_POST['doModifyUsers']) ) {
 		$userservice->modifyUsers();
+	} elseif ( isset($_POST['doModifyBookmarks']) ) {
+		$bookmarkservice->modifyBookmarks();
 	} elseif ( isset($_POST['doModifyTags']) ) {
-		$userservice->modifyTags();
+		$bookmarkservice->modifyTags();
 	}
 
     if($userservice->isAdminPassDefault($current_user['username'])) {
@@ -61,7 +64,25 @@ else {
     $tplVars['isAdmin'] = true;
     $tplVars['formaction'] = "admin.php";
     $tplVars['subtitle'] = T_("Administrative Console"); 
-    $templateservice->loadTemplate('admin.tpl', $tplVars);
+
+	if ( isset($_REQUEST['mod']) ) {
+		switch ( $_REQUEST['mod'] ) {
+			case "users":
+    			$templateservice->loadTemplate('admin-users.tpl', $tplVars);
+				break;
+			case "bookmarks":
+    			$templateservice->loadTemplate('admin-bookmarks.tpl', $tplVars);
+				break;
+			case "tags":
+    			$templateservice->loadTemplate('admin-tags.tpl', $tplVars);
+				break;
+			default:
+    			$templateservice->loadTemplate('admin-users.tpl', $tplVars);
+		}
+	} else {
+    	$templateservice->loadTemplate('admin-users.tpl', $tplVars);
+	}
+
 }
 
 ?>

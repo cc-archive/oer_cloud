@@ -569,17 +569,17 @@ class UserService {
 		if ( isset($_POST['userList']) ) {
 			# pull list of user ids from the submitted form
 			$userIds = implode(",", $_POST['userList']);
-			switch ( $_POST['modifyUsersAction'] ) {
+			switch ( $_POST['uAction'] ) {
 				case "activate":
 					$sql = sprintf ("
 						UPDATE %susers SET
 							uStatus = '1',
 							uModified = '%s'
-						WHERE %s IN ($userIds)
+						WHERE uId IN (%s)
 						",
 						$GLOBALS['tableprefix'], 
         				gmdate('Y-m-d H:i:s', time()),
-						$this->fields['primary']
+						$userIds
 					);
 					$actionMsg = "Activating the selected user(s)";
 					break;
@@ -588,11 +588,11 @@ class UserService {
 						UPDATE %susers SET
 							uStatus = '0',
 							uModified = '%s'
-						WHERE %s IN ($userIds)
+						WHERE uId IN (%s)
 						",
 						$GLOBALS['tableprefix'], 
         				gmdate('Y-m-d H:i:s', time()),
-					   	$this->fields['primary']
+						$userIds
 					);
 					$actionMsg = "Deactivating the selected user(s)";
 					break;
@@ -601,11 +601,11 @@ class UserService {
 						UPDATE %susers SET
 							isFlagged = '1',
 							uModified = '%s'
-						WHERE %s IN ($userIds)
+						WHERE uId IN (%s)
 						",
 						$GLOBALS['tableprefix'], 
         				gmdate('Y-m-d H:i:s', time()),
-						$this->fields['primary']
+						$userIds
 					);
 					$actionMsg = "Flagging the selected user(s)";
 					break;
@@ -614,11 +614,11 @@ class UserService {
 						UPDATE %susers SET
 					   		isFlagged = '0',
 							uModified = '%s'
-						WHERE %s IN ($userIds)
+						WHERE uId IN (%s)
 						",
 						$GLOBALS['tableprefix'], 
         				gmdate('Y-m-d H:i:s', time()),
-						$this->fields['primary']
+						$userIds
 					);
 					$actionMsg = "Unflagging the selected user(s)";
 					break;
@@ -627,11 +627,11 @@ class UserService {
 						UPDATE %susers SET
 					   		isAdmin = '1',
 							uModified = '%s'
-						WHERE %s IN ($userIds)
+						WHERE uId IN (%s)
 						",
 						$GLOBALS['tableprefix'],
         				gmdate('Y-m-d H:i:s', time()),
-						$this->fields['primary']
+						$userIds
 					);
 					$actionMsg = "Granting admin privileges to the selected user(s)";
 					break;
@@ -640,11 +640,11 @@ class UserService {
 						UPDATE %susers SET
 							isAdmin = '0',
 							uModified = '%s'
-						WHERE %s IN ($userIds)
+						WHERE uId IN (%s)
 						",
 						$GLOBALS['tableprefix'], 
         				gmdate('Y-m-d H:i:s', time()),
-						$this->fields['primary']
+						$userIds
 					);
 					$actionMsg = "Revoking admin privileges from the selected user(s)";
 					break;
@@ -652,10 +652,10 @@ class UserService {
 					$sql = sprintf ("
 						DELETE %susers.*, %sbookmarks.*, %stags.*
 						FROM %susers LEFT JOIN %sbookmarks
-							ON %susers.%s = %sbookmarks.%s
+							ON %susers.uId = %sbookmarks.uId
 						LEFT JOIN %stags
 							ON %sbookmarks.bId = %stags.bId
-						WHERE %susers.%s IN (%s);
+						WHERE %susers.uId IN (%s);
 						",
 						$GLOBALS['tableprefix'],
 						$GLOBALS['tableprefix'],
@@ -663,21 +663,18 @@ class UserService {
 						$GLOBALS['tableprefix'],
 						$GLOBALS['tableprefix'],
 						$GLOBALS['tableprefix'],
-						$this->fields['primary'],
-						$GLOBALS['tableprefix'],
-						$this->fields['primary'],
 						$GLOBALS['tableprefix'],
 						$GLOBALS['tableprefix'],
 						$GLOBALS['tableprefix'],
 						$GLOBALS['tableprefix'],
-						$this->fields['primary'],
+						$GLOBALS['tableprefix'],
 						$userIds
 					);
 					$actionMsg = "Deleting the selected user(s)";
 					break;
 				default:
-					$sql = "";
 					$tplVars['error'] = "Unrecognized action. No changes were made.";
+					return false;
 			}
 
         	# Execute the sql statement.

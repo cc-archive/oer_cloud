@@ -515,36 +515,36 @@ ul {
 	background: #ff9c8c;
 }
 
-table.usersTable {
+table.adminTable {
 	width: 100%;
 	border: 1px solid grey;
 	margin: 0;
 }
 
-table.usersTable td {
+table.adminTable td {
 	border: 1px solid #e0e0e0;
-	padding-left: 1ex;
+	padding: .5ex;
 	text-align: left; 
 }
 
-table.usersTable th {
+table.adminTable th {
 	font-weight: bold;
 	text-align: center;
 	background-color: #555151;
 	color: #ffffff;
 }
 
-table.usersTable th > a:link {
+table.adminTable th > a:link {
 	text-decoration: none;
 	color: #ffffff;
 }
 
-table.usersTable th > a:visited {
+table.adminTable th > a:visited {
 	text-decoration: none;
 	color: #ffffff;
 }
 
-table.usersTable  th > a:hover {
+table.adminTable  th > a:hover {
 	text-decoration: underline;
 	color: #ffffff;
 }

@@ -485,6 +485,147 @@ class BookmarkService {
 
 	}
 
+	function getFlaggedBookmarks() {
+
+		$sql = sprintf ("
+			SELECT %sbookmarks.*, %susers.username
+		  	FROM %sbookmarks INNER JOIN %susers
+				ON %sbookmarks.uId = %susers.uId
+			WHERE bFlagCount > 0
+			ORDER BY bFlagCount DESC, bTitle
+			",
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix']
+		);
+		$qid = $this->db->sql_query($sql);
+		$bookmarks = $this->db->sql_fetchrowset($qid);
+
+		# let's grab the username(s) of the people who flagged the various bookmarks.
+		# this is a convenience for the admin
+		for ( $idx = 0; $idx < count($bookmarks); $idx++ ) {
+			# strip off any extraneous leading or trailing colons
+			$userIds = trim($bookmarks[$idx]['bFlaggedBy'], ":");
+			# replace the colon with a comman which is usable in a sql statement
+			$userIds = preg_replace("/:/", ",", $userIds);
+			# grab the users who flagged this bookmark
+			if ( ! empty($userIds) ) {
+				$sql = sprintf ("
+					SELECT username FROM %susers
+					WHERE uId IN ($userIds)
+					",
+					$GLOBALS['tableprefix']
+				);
+				$qid = $this->db->sql_query($sql);
+				$flaggers = array();
+				while ( $row = $this->db->sql_fetchrow($qid) ) {
+					$flaggers[] = $row['username'];
+				}
+				# turn the array into a comma separated string and then assign
+				# it to our bookmarks array
+				$flaggedBy = implode(",", $flaggers);
+				$bookmarks[$idx]['flaggedBy'] = $flaggedBy;
+			}
+		}
+
+		return $bookmarks;
+
+	}
+
+	# make changes to bookmarks
+	function modifyBookmarks() {
+
+		global $tplVars;
+
+		# initialize a sql string
+		$sql = "";
+
+		if ( isset($_POST['bookmarkList']) ) {
+			# pull list of bookmark ids from the submitted form
+			$bookmarkIds = implode(",", $_POST['bookmarkList']);
+			switch ( $_POST['bAction'] ) {
+				case "unflag":
+					$sql = sprintf ("
+						UPDATE %sbookmarks SET
+							bFlagCount = '0',
+							bModified = '%s',
+							bFlaggedBy = ''
+						WHERE bId IN (%s)
+						",
+						$GLOBALS['tableprefix'], 
+        				gmdate('Y-m-d H:i:s', time()),
+						$bookmarkIds
+					);
+					$actionMsg = "Unflagging the selected bookmark(s)";
+					break;
+				case "disable":
+					$sql = sprintf ("
+						UPDATE %sbookmarks SET
+							bStatus = '1',
+							bModified = '%s'
+						WHERE bId IN (%s)
+						",
+						$GLOBALS['tableprefix'], 
+						gmdate('Y-m-d H:i:s', time()),
+						$bookmarkIds
+					);
+					$actionMsg = "Disabling the selected bookmark(s)";
+					break;
+				case "enable":
+					$sql = sprintf ("
+						UPDATE %sbookmarks SET
+							bStatus = '0',
+							bModified = '%s'
+						WHERE bId IN (%s)
+						",
+						$GLOBALS['tableprefix'], 
+						gmdate('Y-m-d H:i:s', time()),
+						$bookmarkIds
+					);
+					$actionMsg = "Enabling the selected bookmark(s)";
+					break;
+				case "delete":
+					$sql = sprintf ("
+						DELETE %sbookmarks.*, %stags.*
+						FROM %sbookmarks LEFT JOIN %stags
+							ON %sbookmarks.bId = %stags.bId
+						WHERE %sbookmarks.bId IN (%s);
+						",
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$GLOBALS['tableprefix'],
+						$bookmarkIds
+					);
+					$actionMsg = "Deleting the selected bookmark(s)";
+					break;
+				default:
+					$tplVars['error'] = "Unrecognized action. No changes were made.";
+					return false;
+			}
+
+        	# Execute the sql statement.
+			$this->db->sql_transaction('begin');
+			if ( ! ($dbresult = & $this->db->sql_query($sql)) ) {
+				$this->db->sql_transaction('rollback');
+				$tplVars['error'] = "$actionMsg failed.";
+				return false;
+			}
+			$tplVars['msg'] = "$actionMsg was successful.";
+			$this->db->sql_transaction('commit');
+			return true;
+		} else {
+			$tplVars['error'] =  "You must select at least one bookmark.";
+			return false;
+		}
+
+	}
 
 }
 
