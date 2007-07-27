@@ -1,6 +1,5 @@
 <?php
 
-$userservice =& ServiceFactory::getServiceInstance('UserService');
 $bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
 
 $this->includeTemplate($GLOBALS['top_include']);

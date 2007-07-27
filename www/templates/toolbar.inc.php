@@ -20,7 +20,7 @@ if ( $isAdmin ) {
         <li class="access">
           <ul>
             <li><strong><?= $cUsername ?>:</strong>&nbsp;</li>
-            <li><a href="<?php echo $userservice->getProfileUrl($userid, $user); ?>"><?php echo T_('Profile'); ?></a></li>
+			<li><a href="<?php echo "{$root}profile/$cUsername/";?>"><?php echo T_('Profile'); ?></a></li>
             <li><a href="<?php echo $GLOBALS['root']; ?>?action=logout"><?php echo T_('Log Out'); ?></a></li>
           </ul>
         </li>

@@ -41,9 +41,8 @@ class TagService {
             }
         }
         
-        // convert tags that are in the 
-        // global tag_convert_map
-        $tags = $this->queryTagMap($tags);
+		# Apply tag mappings
+        $tags = $this->applyTagmaps($tags);
 
         $tags_count = count($tags);
         for ($i = 0; $i < $tags_count; $i++) {
@@ -360,73 +359,167 @@ class TagService {
         return $output;
     }
 
-    function queryTagMap($tags) {
-        // read the file into an array
-        $fileName = 'tagmap.array';
-        $mapFile = fopen($fileName, 'r') or die;
-        $tagMap = array();
-
-        while($line = fgets($mapFile))  {
-            $line = trim($line);
-            $spacePos = stripos($line, ' ');
-            $tagMap[substr($line, 0, $spacePos)] = substr($line, $spacePos, strlen($line));
-        }
-
-        fclose($mapFile);
-
-        // change the unwanted tags (if any) to
-        // the desired tags
-        $tagCount = 0;
-        foreach($tags as $tag) {
-            if(array_key_exists($tag, $tagMap)) {
-                $tags[$tagCount] = $tagMap[$tag];
-            }
-            $tagCount++;
-        }
-
-        return $tags;
-    }
-
-    function addEntryToTagMap($fromTag, $toTag) {
-        if(strlen($fromTag) > 32 or strlen($toTag) > 32) 
-            return false;
-        $userservice =& ServiceFactory::getServiceInstance('UserService');
-        $fromTag = $userservice->safeString($fromTag);
-        $toTag = $userservice->safeString($toTag);
-
-        // read the file into an array
-        $fileName = 'tagmap.array';
-        $mapFile = fopen($fileName, 'r');
-        if(!$mapFile) 
-            return false;
-        $tagMap = array();
-
-        while($line = fgets($mapFile))  {
-            $line = trim($line);    
-            $spacePos = stripos($line, ' ');    
-            $tagMap[substr($line, 0, $spacePos)] = substr($line, $spacePos, strlen($line));
-        }
-
-        fclose($mapFile);
-        
-        // add the new entry to the array
-        $tagMap[$fromTag] = $toTag; 
-
-        // write the array to the file
-        $mapFile = fopen($fileName, 'w');
-        $tagKeys = array_keys($tagMap);
-
-        for($i = 0; $i<count($tagKeys); $i++) {
-            $s = $tagKeys[$i] .' '. $tagMap[$tagKeys[$i]] . "\n";
-            fwrite($mapFile, $s);
-        }
-
-        fclose($mapFile);
-        return true;
-    }
-
     // Properties
     function getTableName()       { return $this->tablename; }
     function setTableName($value) { $this->tablename = $value; }
+
+	/*
+	 * Function added by Nathan Kinkade
+	 */
+
+	function getTagmaps() {
+		
+		$sql = sprintf ("
+			SELECT * FROM %stagmaps
+			ORDER BY fromTag
+			",
+			$GLOBALS['tableprefix']
+		);
+		$qid = $this->db->sql_query($sql);
+		$tagmaps = $this->db->sql_fetchrowset($qid);
+
+		return $tagmaps;
+
+	}
+
+	# rename tags
+	function renameTags() {
+
+		global $tplVars;
+
+		# strip white space off beginning and end
+		if ( isset($_POST['doRenameTags']) ) {
+
+			$fromTag = trim($_POST['fromTag']);
+			$toTag = trim($_POST['toTag']);
+
+			if ( (strlen($fromTag) > 32) || (strlen($toTag) > 32) ) {
+				$tplVars['error'] = "Tag names cannot be longer than 32 characters.";
+				return false;
+			}
+
+			# don't let the script continue if either the source or target tag name is missing
+			if ( empty($fromTag) || empty($toTag) ) {
+				$tplVars['error'] = "You must specify both a source tag name and a target tag name.";
+				return false;
+			}
+
+			$sql = sprintf ("
+				UPDATE %stags SET
+					tag = '%s'
+				WHERE tag = '%s'
+				",
+				$GLOBALS['tableprefix'],
+				$this->db->sql_escape($toTag),
+				$this->db->sql_escape($fromTag)
+			);
+
+			if ( $this->db->sql_query($sql) ) {
+				$tplVars['msg'] = "All tags with name '$fromTag' were successfully renamed to '$toTag'.";
+			} else {
+				$tplVars['error'] = "Renaming tags from '$fromTag' to '$toTag' failed.";
+			}
+
+			if ( isset($_POST['persistentTagmap']) ) {
+				if ( $this->addTagmap($fromTag, $toTag) ) {
+					$tplVars['msg'] .= " The tagmap was made persistent.";
+				} else {
+					$tplVars['error'] .= " Making the tagmap persistent failed.";
+				}
+			}
+
+			return true;
+
+		} else {
+			$tplVars['error'] = "This script was not accessed correctly.  Exiting ...";
+			return false;
+		}
+
+	}
+
+	function addTagmap($fromTag, $toTag) {
+
+		$sql = sprintf ("
+			INSERT INTO %stagmaps (fromTag, toTag)
+			VALUES ('%s','%s')
+			",
+			$GLOBALS['tableprefix'],
+			$this->db->sql_escape($fromTag),
+			$this->db->sql_escape($toTag)
+		);
+		if ( $this->db->sql_query($sql) ) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	function modifyTagmaps() {
+
+		global $tplVars;
+
+		if ( isset($_POST['tagmapList']) ) {
+			# pull list of tagmap ids from the submitted form
+			$tagmapIds = implode(",", $_POST['tagmapList']);
+			switch ( $_POST['tAction'] ) {
+				case "delete":
+					$sql = sprintf ("
+						DELETE FROM %stagmaps
+						WHERE id IN (%s)
+						",
+						$GLOBALS['tableprefix'],
+						$tagmapIds
+					);
+					$actionMsg = "Deleting the selected tag mapping(s)";
+					break;
+				default:
+					$tplVars['error'] = "Unrecognized action. No changes were made.";
+					return false;
+			}
+
+        	# Execute the sql statement.
+			$this->db->sql_transaction('begin');
+			if ( ! ($dbresult = & $this->db->sql_query($sql)) ) {
+				$this->db->sql_transaction('rollback');
+				$tplVars['error'] = "$actionMsg failed.";
+				return false;
+			}
+			$tplVars['msg'] = "$actionMsg was successful.";
+			$this->db->sql_transaction('commit');
+			return true;
+		} else {
+			$tplVars['error'] = "You must select at least one tag mapping.";
+			return false;
+		}
+
+	}
+
+	function applyTagmaps($tags) {
+
+		if ( $tags ) {
+			for ( $idx = 0; $idx < count($tags); $idx++ ) {
+				$fromTag = trim($tags[$idx]);
+				$sql = sprintf ("
+					SELECT * from %stagmaps
+					WHERE fromTag = '%s'
+					",
+					$GLOBALS['tableprefix'],
+					$fromTag
+				);
+				$qid = $this->db->sql_query($sql);
+				$mapping = $this->db->sql_fetchrow($qid);
+				if ( $mapping ) {
+					$tags[$idx] = $mapping['toTag'];
+				}
+			}
+		}
+
+		return $tags;
+
+	}
+
+
 }
+
 ?>

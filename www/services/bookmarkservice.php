@@ -417,7 +417,7 @@ class BookmarkService {
 
 
 	/*
-	 * Functions added Nathan Kinkade
+	 * Functions added by Nathan Kinkade
 	 */
 
 	function flagBookmark($bId) {

@@ -22,6 +22,7 @@ require_once('header.inc.php');
 
 $userservice =& ServiceFactory::getServiceInstance('UserService');
 $bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
+$tagservice =& ServiceFactory::getServiceInstance('TagService');
 $templateservice =& ServiceFactory::getServiceInstance('TemplateService');
 $current_user = $userservice->getCurrentUser();
 
@@ -51,8 +52,10 @@ else {
 		$userservice->modifyUsers();
 	} elseif ( isset($_POST['doModifyBookmarks']) ) {
 		$bookmarkservice->modifyBookmarks();
+	} elseif ( isset($_POST['doRenameTags']) ) {
+		$tagservice->renameTags();
 	} elseif ( isset($_POST['doModifyTags']) ) {
-		$bookmarkservice->modifyTags();
+		$tagservice->modifyTagmaps();
 	}
 
     if($userservice->isAdminPassDefault($current_user['username'])) {

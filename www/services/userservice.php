@@ -694,11 +694,6 @@ class UserService {
 
 	}
 
-	# make changes to tags
-	function modifyTags() {
-
-	}
-	
 }
 
 ?>
