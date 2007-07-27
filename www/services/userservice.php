@@ -544,14 +544,13 @@ class UserService {
 		}
 
 		$sql = sprintf ("
-			SELECT * FROM %s
+			SELECT * FROM %susers
 			ORDER BY %s
 			",
-			"{$GLOBALS['tableprefix']}users",
+			$GLOBALS['tableprefix'],
 			$orderBy
 		);
 		$queryId = $this->db->sql_query($sql);
-
 		$users = $this->db->sql_fetchrowset($queryId);
 
 		return $users;
@@ -565,87 +564,34 @@ class UserService {
 
 		# initialize a sql string
 		$sql = "";
+		$updateFields = "";
 
 		if ( isset($_POST['userList']) ) {
 			# pull list of user ids from the submitted form
 			$userIds = implode(",", $_POST['userList']);
 			switch ( $_POST['uAction'] ) {
 				case "activate":
-					$sql = sprintf ("
-						UPDATE %susers SET
-							uStatus = '1',
-							uModified = '%s'
-						WHERE uId IN (%s)
-						",
-						$GLOBALS['tableprefix'], 
-        				gmdate('Y-m-d H:i:s', time()),
-						$userIds
-					);
+					$updateFields = "uStatus = '1'";
 					$actionMsg = "Activating the selected user(s)";
 					break;
 				case "deactivate":
-					$sql = sprintf ("
-						UPDATE %susers SET
-							uStatus = '0',
-							uModified = '%s'
-						WHERE uId IN (%s)
-						",
-						$GLOBALS['tableprefix'], 
-        				gmdate('Y-m-d H:i:s', time()),
-						$userIds
-					);
+					$updateFields = "uStatus = '0'";
 					$actionMsg = "Deactivating the selected user(s)";
 					break;
 				case "flag":
-					$sql = sprintf ("
-						UPDATE %susers SET
-							isFlagged = '1',
-							uModified = '%s'
-						WHERE uId IN (%s)
-						",
-						$GLOBALS['tableprefix'], 
-        				gmdate('Y-m-d H:i:s', time()),
-						$userIds
-					);
+					$updateFields = "isFlagged = '1'";
 					$actionMsg = "Flagging the selected user(s)";
 					break;
 				case "unflag":
-					$sql = sprintf ("
-						UPDATE %susers SET
-					   		isFlagged = '0',
-							uModified = '%s'
-						WHERE uId IN (%s)
-						",
-						$GLOBALS['tableprefix'], 
-        				gmdate('Y-m-d H:i:s', time()),
-						$userIds
-					);
+					$updateFields = "isFlagged = '0'";
 					$actionMsg = "Unflagging the selected user(s)";
 					break;
 				case "makeAdmin":
-					$sql = sprintf ("
-						UPDATE %susers SET
-					   		isAdmin = '1',
-							uModified = '%s'
-						WHERE uId IN (%s)
-						",
-						$GLOBALS['tableprefix'],
-        				gmdate('Y-m-d H:i:s', time()),
-						$userIds
-					);
+					$updateFields = "isAdmin = '1'";
 					$actionMsg = "Granting admin privileges to the selected user(s)";
 					break;
 				case "yankAdmin":
-					$sql = sprintf ("
-						UPDATE %susers SET
-							isAdmin = '0',
-							uModified = '%s'
-						WHERE uId IN (%s)
-						",
-						$GLOBALS['tableprefix'], 
-        				gmdate('Y-m-d H:i:s', time()),
-						$userIds
-					);
+					$updateFields = "isAdmin = '0'";
 					$actionMsg = "Revoking admin privileges from the selected user(s)";
 					break;
 				case "delete":
@@ -675,6 +621,25 @@ class UserService {
 				default:
 					$tplVars['error'] = "Unrecognized action. No changes were made.";
 					return false;
+			}
+
+			# since the update statement for almost all of the possible actions except
+			# delete are almost totally identical except for which field gets updated,
+			# we construct the sql for those actions here, rather than repeating the
+			# below code 6 or 7 times overs.  this isn't necessarily more efficient,
+			# perhaps less so, but it reduces the amount of code
+			if ( ! empty($updateFields) ) {
+				$sql = sprintf ("
+					UPDATE %susers SET
+						%s,
+						uModified = '%s'
+					WHERE uId IN (%s)
+					",
+					$GLOBALS['tableprefix'], 
+					$updateFields,
+       				gmdate('Y-m-d H:i:s', time()),
+					$userIds
+				);
 			}
 
         	# Execute the sql statement.

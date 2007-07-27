@@ -507,7 +507,11 @@ class BookmarkService {
 		# let's grab the username(s) of the people who flagged the various bookmarks.
 		# this is a convenience for the admin
 		for ( $idx = 0; $idx < count($bookmarks); $idx++ ) {
-			# strip off any extraneous leading or trailing colons
+			# strip off any extraneous leading or trailing colons, and there will always
+			# be an extra one at the beginning because the method that inserts appends
+			# users doesn't bother to check to see if it's null/empty and always inserts
+			# ":<uId>".  this is on purpose because it seems easier to do this than to
+			# bother checking if the field was empty using SQL.
 			$userIds = trim($bookmarks[$idx]['bFlaggedBy'], ":");
 			# replace the colon with a comman which is usable in a sql statement
 			$userIds = preg_replace("/:/", ",", $userIds);
