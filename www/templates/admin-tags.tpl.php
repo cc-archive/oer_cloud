@@ -66,7 +66,7 @@ echo <<<HTML
 			<option value='delete'>Delete</option>
 		</select>
 		<input type='hidden' name='mod' value='tags' /> 
-		<input type='submit' name='doModifyTags' value='Submit' /> 
+		<input type='submit' name='doModifyTagmaps' value='Submit' /> 
 	</div>
 </form>
 

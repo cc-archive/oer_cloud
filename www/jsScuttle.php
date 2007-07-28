@@ -140,31 +140,18 @@ function playerLoad() {
     }
 }
 
+//
+// Function added by Nathan Kinkade
+//
 
 function getElement(elemid) {
 	/* the former for Firefox and crew, the latter for IE */
 	return (document.getElementById) ? document.getElementById(elemid) : document.all[elemid];
 }
 
-function showUsers(userDiv,tagDiv) {
-	var divAdminUsers = getElement(userDiv);
-	var divAdminTags = getElement(tagDiv);
-	divAdminUsers.style.display = "";
-	divAdminTags.style.display = "none";
-	return true;
-}
-
-function showTags(tagDiv,userDiv) {
-	var divAdminTags = getElement(tagDiv);
-	var divAdminUsers = getElement(userDiv);
-	divAdminTags.style.display = "";
-	divAdminUsers.style.display = "none";
-	return true;
-}
-
 function validateModifyUsersForm(formId) {
 	var usersForm = getElement(formId);
-	if ( usersForm.modifyUsersAction.options[usersForm.modifyUsersAction.selectedIndex].value == "delete" ) {
+	if ( usersForm.uAction.options[usersForm.uAction.selectedIndex].value == "delete" ) {
 		var msg = "Are you sure that you want to permanently delete the selected users and all of their bookmarks and tags? This cannot be undone.";
 		if ( confirm(msg) ) {
 			var doModifyUsers = document.createElement('input');
@@ -172,6 +159,42 @@ function validateModifyUsersForm(formId) {
 			doModifyUsers.setAttribute('name','doModifyUsers');
 			usersForm.appendChild(doModifyUsers);
 			usersForm.submit;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+function validateModifyBookmarksForm(formId) {
+	var bookmarksForm = getElement(formId);
+	if ( bookmarksForm.bAction.options[bookmarksForm.bAction.selectedIndex].value == "delete" ) {
+		var msg = "Are you sure that you want to permanently delete the selected bookmarks and all associated tags? This cannot be undone.";
+		if ( confirm(msg) ) {
+			var doModifyUsers = document.createElement('input');
+			doModifyBookmarks.setAttribute('type','hidden');
+			doModifyBookmarks.setAttribute('name','doModifyBookmarks');
+			bookmarksForm.appendChild(doModifyBookmarks);
+			bookmarksForm.submit;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+function validateModifyTagmapsForm(formId) {
+	var tagmapsForm = getElement(formId);
+	if ( tagmapsForm.tAction.options[tagmapsForm.tAction.selectedIndex].value == "delete" ) {
+		var msg = "Are you sure that you want to permanently delete the selected tags? This cannot be undone.";
+		if ( confirm(msg) ) {
+			var doModifyTagmaps = document.createElement('input');
+			doModifyTagmaps.setAttribute('type','hidden');
+			doModifyTagmaps.setAttribute('name','doModifyTagmaps');
+			tagmapsForm.appendChild(doModifyTagmaps);
+			tagmapsForm.submit;
 			return true;
 		} else {
 			return false;

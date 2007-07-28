@@ -54,7 +54,7 @@ else {
 		$bookmarkservice->modifyBookmarks();
 	} elseif ( isset($_POST['doRenameTags']) ) {
 		$tagservice->renameTags();
-	} elseif ( isset($_POST['doModifyTags']) ) {
+	} elseif ( isset($_POST['doModifyTagmaps']) ) {
 		$tagservice->modifyTagmaps();
 	}
 
