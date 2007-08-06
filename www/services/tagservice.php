@@ -44,6 +44,13 @@ class TagService {
 		# Apply tag mappings
         $tags = $this->applyTagmaps($tags);
 
+		# do a little input validation on the tags.  change any quotes to their
+		# html entity values, and also strip off any double quotes that people
+		# try to put around their tags
+		foreach ( $tags as $key => $tagItem ) {
+			$tags[$key] = htmlspecialchars($tags[$key], ENT_QUOTES);
+		}
+
         $tags_count = count($tags);
         for ($i = 0; $i < $tags_count; $i++) {
             $tags[$i] = trim(utf8_strtolower($tags[$i]));
@@ -516,6 +523,21 @@ class TagService {
 		}
 
 		return $tags;
+
+	}
+
+
+	# return a list of every distinct tag in the database
+	function getAllTags() {
+
+		$sql = sprintf ("
+			SELECT DISTINCT tag FROM %stags
+			ORDER BY tag
+			",
+			$GLOBALS['tableprefix']
+		);
+		$qid = $this->db->sql_query($sql);
+		return $this->db->sql_fetchrowset($qid);
 
 	}
 

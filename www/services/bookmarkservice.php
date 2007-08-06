@@ -631,6 +631,30 @@ class BookmarkService {
 
 	}
 
+
+	function getAllBookmarks() {
+		$sql = sprintf ("
+			SELECT %sbookmarks.bId, %sbookmarks.bAddress, GROUP_CONCAT(%stags.tag) AS bTags
+			FROM %sbookmarks LEFT JOIN %stags
+				ON %sbookmarks.bId = %stags.bId
+			WHERE %sbookmarks.bFlagCount < '1' 
+			GROUP BY %sbookmarks.bId
+			",
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix'],
+			$GLOBALS['tableprefix']
+		);
+		$qid = $this->db->sql_query($sql);
+		return $this->db->sql_fetchrowset($qid);
+	}
+
+
 }
 
 ?>

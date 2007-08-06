@@ -30,6 +30,9 @@ function filter($data, $type = NULL) {
             case 'url':
                 $data = rawurlencode($data);
                 break;
+            case 'xml':
+                $data = htmlspecialchars($data, ENT_QUOTES);
+                break;
             default:
                 $data = htmlspecialchars($data);
                 break;
