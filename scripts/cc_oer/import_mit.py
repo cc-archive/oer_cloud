@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 
 import md5
-import datetime
+from datetime import datetime
 import logging
 from lxml import etree
+import warnings
 import sqlalchemy
+
+# cause warnings to raise exceptions.  this will allow me to catch and examine
+# any SQL warnings, like data truncation, that would otherwise have
+# just been issued to stderr
+warnings.filterwarnings(action='error', message='.*')
 
 # setup the database
 db = sqlalchemy.create_engine('mysql://root:tahiti3@localhost/oer', convert_unicode=True)
@@ -33,7 +39,7 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 	title = item.xpath("default:title", namespaces)[0].text
 	address = item.xpath("default:link", namespaces)[0].text
 	description = item.xpath("default:description", namespaces)[0].text
-	time = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+	time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 	hash = md5.new(address).hexdigest()
 
 	# the title and address fields in the db is only 255 chars wide.
@@ -46,15 +52,17 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 		logging.warning('Description for URL %s of length %d truncated to 255 chars.', address, len(description))
 		description = description[:255]
 
+	print str(len(description))
+
 	# build a dict representing the new row that we will insert
 	row = {
 		'uId': '16',
 		'bTitle': title,
 		'bAddress': address,
 		'bDescription': description,
-		'bDateTime': time,
+		'bDatetime': time,
 		'bModified': time,
-		'bHast': hash
+		'bHash': hash
 	}
 
 	try:

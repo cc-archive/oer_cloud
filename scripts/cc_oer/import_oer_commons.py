@@ -6,7 +6,7 @@
 #
 
 import md5
-import datetime
+from datetime import datetime
 import logging
 import csv  # http://docs.python.org/lib/module-csv.html
 import sqlalchemy
@@ -44,7 +44,7 @@ reader = csv.reader(open(import_file), 'oer')
 
 for row in reader:
 	title, address, tags = row
-	time = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+	time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 	hash = md5.new(address).hexdigest()
 
 	# the title and address fields in the db is only 255 chars wide.
@@ -58,9 +58,9 @@ for row in reader:
 		'uId': '8',
 		'bTitle': title,
 		'bAddress': address,
-		'bDateTime': time,
+		'bDatetime': time,
 		'bModified': time,
-		'bHast': hash
+		'bHash': hash
 	}
 
 	try:
