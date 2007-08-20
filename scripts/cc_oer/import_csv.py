@@ -19,29 +19,17 @@ import sqlalchemy
 # such via the "delimiter" and "lineterminator" parameters below.  DONT FORGET
 # to remove the column title row, otherwise this script will import it.
 
-# Define the structure of the file.  The file actually conforms to most of
-# the defaults of the csv module, but I explicity define them here just
-# for the sake of clarity, and I also set some rules regarding quoting
-# and whitespace
-csv.register_dialect(
-	'oer',
-	delimiter='^',
-	lineterminator="\n",
-	quoting=csv.QUOTE_MINIMAL,
-	skipinitialspace=True
-)
+##### --------------- SET THESE VALUES CORRECTLY ------------------- #####
+field_delimiter = '^'
+line_terminator = '\n'
+tag_delimiter = '|'  # specify the delimiter for the items in tag column
+user_id = '8'  # the id of the user to who the bookmarks will be assigned
+##### -------------------------------------------------------------- #####
 
-# specify the delimiter for the items in tag column
-tag_delimiter = ','
+# parse the file passed in as the last argument
+reader = csv.reader(open(sys.argv[-1]), delimiter=field_delimiter, lineterminator=line_terminator)
 
-# the user_id under which to import these bookmarks.  if not specified then the 
-# bookmarks will be orphans with no owner
-user_id = '24'
-
-# the CSV file to work with - the last argument passed to the script
-import_file = sys.argv[-1]
-
-# setup the database
+# setup database connectivity
 db = sqlalchemy.create_engine('mysql://root:tahiti3@localhost/oer', convert_unicode=True)
 metadata = sqlalchemy.MetaData(db)
 bookmarks = sqlalchemy.Table('sc_bookmarks', metadata, autoload=True)
@@ -65,12 +53,8 @@ bookmark_count = 0
 tag_count = 0
 sql_errors = 0
 
-# parse the file we opened earlier
-reader = csv.reader(open(import_file), 'oer')
-
-for row in reader:
+for title, address, description, tags in reader:
 	result = '' # just in case, set result to an empty string
-	title, address, description, tags = row
 	time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 	hash = md5.new(address).hexdigest()
 
