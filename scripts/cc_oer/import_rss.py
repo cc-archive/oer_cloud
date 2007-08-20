@@ -1,50 +1,49 @@
 #!/usr/bin/env python
 
-#
-# A script for importing OER resource information from a delimited text file
-# and then import it into the database which backs http://oercloud.cc.org
-#
-
+import sys
 import md5
 from datetime import datetime
 import logging
-import csv  # http://docs.python.org/lib/module-csv.html
+from lxml import etree
+import warnings
 import sqlalchemy
 
-# the CSV file to work with
-import_file = "/home/nkinkade/cc/cclearn/CoursesLibraries070207.csv"
+# the RSS file to import
+import_file = sys.argv[-1]
+
+# cause warnings to raise exceptions.  this will allow us to catch and examine
+# any SQL warnings, like data truncation, that would otherwise have
+# just been issued to stderr
+warnings.filterwarnings(action='error', message='.*')
 
 # setup the database
 db = sqlalchemy.create_engine('mysql://root:tahiti3@localhost/oer', convert_unicode=True)
 metadata = sqlalchemy.MetaData(db)
 bookmarks = sqlalchemy.Table('sc_bookmarks', metadata, autoload=True)
-tags_tbl = sqlalchemy.Table('sc_tags', metadata, autoload=True)
+tags = sqlalchemy.Table('sc_tags', metadata, autoload=True)
 
 # configure the logger.  see: http://docs.python.org/lib/module-logging.html
 logging.basicConfig(
 	format='%(levelname)-8s %(message)s',
-	filename='import_oer_commons.log',
+	filename='import_rss.log',
 	filemode='w'
 )
 
-# Define the structure of the file.  The file actually conforms to most of
-# the defaults of the csv module, but I explicity define them here just
-# for the sake of clarity, and I also set some rules regarding quoting
-# and whitespace
-csv.register_dialect(
-	'oer',
-	delimiter=',',
-	lineterminator="\r\n",
-	quoting=csv.QUOTE_MINIMAL,
-	skipinitialspace=True
-)
+# XML namespaces used by this document
+namespaces = {
+	"rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+	"dc": "http://purl.org/dc/elements/1.1/",
+	"default": "http://purl.org/rss/1.0/"
+}
 
-# parse the file we opened earlier
-reader = csv.reader(open(import_file), 'oer')
+# parse the XML file .. in this case it's an RSS feed
+xml_doc = etree.parse(import_file)
 
-for row in reader:
-	title, address, tags = row
-	time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
+	title = item.xpath("default:title", namespaces)[0].text
+	address = item.xpath("default:link", namespaces)[0].text
+	description = item.xpath("default:description", namespaces)[0].text
+	time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 	hash = md5.new(address).hexdigest()
 
 	# the title and address fields in the db is only 255 chars wide.
@@ -53,11 +52,18 @@ for row in reader:
 		logging.warning('Title for URL %s of length %d truncated to 255 chars.', address, len(title))
 		title = title[:255]
 
+	if len(description) > 255:
+		logging.warning('Description for URL %s of length %d truncated to 255 chars.', address, len(description))
+		description = description[:255]
+
+	print str(len(description))
+
 	# build a dict representing the new row that we will insert
 	row = {
-		'uId': '8',
+		'uId': '16',
 		'bTitle': title,
 		'bAddress': address,
+		'bDescription': description,
 		'bDatetime': time,
 		'bModified': time,
 		'bHash': hash
@@ -73,28 +79,21 @@ for row in reader:
 	if result.rowcount == 1:
 		# grab the id of the bookmark we just inserted
 		bId = result.lastrowid
-
-		# work through the list of tags that were split out from the row above
-		# the delimiter is a pipe symbol
-		tags = tags.split('|')
-
-		for tag in tags:
-			# remove possible whitespace
-			tag = tag.strip()
-
+		for tag in item.xpath("dc:subject", namespaces):
+			
 			# the tag field in the db is only 32 chars wide.  if this tag is wider
 			# truncate the tag name and write a log message.
-			if len(tag) > 32:
-				logging.warning('Tag for bId %d of length %d truncated to 32 chars.', bId, len(tag))
-				tag = tag[:32]
+			if len(tag.text) > 32:
+				logging.warning('Tag for bId %d of length %d truncated to 32 chars.', bId, len(tag.text))
+				tag.text = tag.text[:32]
 
-			row = {'bId': bId, 'tag': tag}
+			row = {'bId': bId, 'tag': tag.text}
 
 			# the import file may possible have the same tag listed twice for a given item,
 			# which will raise an exception due to a duplicate key violation in mysql.  just
 			# ignore such errors
 			try:
-				result = tags_tbl.insert().execute(**row)
+				result = tags.insert().execute(**row)
 			except sqlalchemy.exceptions.SQLError, e:
 				logging.error('For bId %d : %s', bId, e.args)
 				pass
