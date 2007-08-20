@@ -41,14 +41,17 @@ class TagService {
             }
         }
         
-		# Apply tag mappings
-        $tags = $this->applyTagmaps($tags);
+		# Make sure there are tags before we try to look through them
+		if ( count($tags) ) {
+			# Apply tag mappings
+        	$tags = $this->applyTagmaps($tags);
 
-		# do a little input validation on the tags.  change any quotes to their
-		# html entity values, and also strip off any double quotes that people
-		# try to put around their tags
-		foreach ( $tags as $key => $tagItem ) {
-			$tags[$key] = htmlspecialchars($tags[$key], ENT_QUOTES);
+			# do a little input validation on the tags.  change any quotes to their
+			# html entity values, and also strip off any double quotes that people
+			# try to put around their tags
+			foreach ( $tags as $key => $tagItem ) {
+				$tags[$key] = htmlspecialchars($tags[$key], ENT_QUOTES);
+			}
 		}
 
         $tags_count = count($tags);
