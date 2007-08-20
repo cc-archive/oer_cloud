@@ -36,10 +36,20 @@ namespaces = {
 	"default": "http://purl.org/rss/1.0/"
 }
 
+# initialize some counters so that we can report stats to the user
+# when the script is done
+bookmark_count = 0
+tag_count = 0
+sql_errors = 0
+truncated_titles = 0
+truncated_descriptions = 0
+truncated_tags = 0
+
 # parse the XML file .. in this case it's an RSS feed
 xml_doc = etree.parse(import_file)
 
 for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
+	result = '' # set result to an empty string just in case
 	title = item.xpath("default:title", namespaces)[0].text
 	address = item.xpath("default:link", namespaces)[0].text
 	description = item.xpath("default:description", namespaces)[0].text
@@ -51,12 +61,12 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 	if len(title) > 255:
 		logging.warning('Title for URL %s of length %d truncated to 255 chars.', address, len(title))
 		title = title[:255]
+		truncated_titles += 1
 
 	if len(description) > 255:
 		logging.warning('Description for URL %s of length %d truncated to 255 chars.', address, len(description))
 		description = description[:255]
-
-	print str(len(description))
+		truncated_descriptions += 1
 
 	# build a dict representing the new row that we will insert
 	row = {
@@ -72,11 +82,13 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 	try:
 		result = bookmarks.insert().execute(**row)
 	except sqlalchemy.exceptions.SQLError, e:
-		logging.error('Failed to add %s : %s', address, e.args)
-		pass
+		logging.error('SQL error while adding bookmark %s : %s', address, e.args)
+		sql_errors += 1
 
 	# if the query inserted a row then we can go ahead and add the tags
 	if result.rowcount == 1:
+		print '.',
+		bookmark_count += 1
 		# grab the id of the bookmark we just inserted
 		bId = result.lastrowid
 		for tag in item.xpath("dc:subject", namespaces):
@@ -86,6 +98,7 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 			if len(tag.text) > 32:
 				logging.warning('Tag for bId %d of length %d truncated to 32 chars.', bId, len(tag.text))
 				tag.text = tag.text[:32]
+				truncated_tags += 1
 
 			row = {'bId': bId, 'tag': tag.text}
 
@@ -95,5 +108,18 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 			try:
 				result = tags.insert().execute(**row)
 			except sqlalchemy.exceptions.SQLError, e:
-				logging.error('For bId %d : %s', bId, e.args)
-				pass
+				logging.error('SQL error for bId %d : %s', bId, e.args)
+				sql_errors += 1
+			else:
+				if result.rowcount == 1:
+					tag_count += 1
+
+
+print '\n'
+print 'Bookmarks added: %d' % bookmark_count
+print 'Tags added: %d' % tag_count
+print 'Bookmark titles truncated: %d' % truncated_titles
+print 'Bookmark descriptions truncated: %d' % truncated_descriptions
+print 'Tag titles truncated: %d' % truncated_tags
+print 'SQL errors/warnings issued: %d' % sql_errors
+print '\nSee import_csv.log for SQL warning and error details.'

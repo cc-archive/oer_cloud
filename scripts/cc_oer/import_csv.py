@@ -9,13 +9,15 @@ import sys
 import md5
 from datetime import datetime
 import logging
+import warnings
 import csv  # http://docs.python.org/lib/module-csv.html
 import sqlalchemy
 
 # WARNING: this script expects that there will be 4 columns and in this exact order:
 # 	Title, URL, Description, tags
 # You may define the properties of the delimited file in terms of delimiters and
-# such via the "delimiter" and "lineterminator" parameters below.
+# such via the "delimiter" and "lineterminator" parameters below.  DONT FORGET
+# to remove the column title row, otherwise this script will import it.
 
 # Define the structure of the file.  The file actually conforms to most of
 # the defaults of the csv module, but I explicity define them here just
@@ -52,23 +54,25 @@ logging.basicConfig(
 	filemode='w'
 )
 
+# cause warnings to raise exceptions.  this will allow us to catch and examine
+# any SQL warnings, like data truncation, that would otherwise have
+# just been issued to stderr
+warnings.filterwarnings(action='error', message='.*')
+
+# initialize some counters so that we can report stats to the user
+# when the script is done
+bookmark_count = 0
+tag_count = 0
+sql_errors = 0
+
 # parse the file we opened earlier
 reader = csv.reader(open(import_file), 'oer')
 
 for row in reader:
+	result = '' # just in case, set result to an empty string
 	title, address, description, tags = row
 	time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 	hash = md5.new(address).hexdigest()
-
-	# the title and address fields in the db is only 255 chars wide.
-	# truncate the values if they are larger than 255 and write a log message.
-	if len(title) > 255:
-		logging.warning('Title for URL %s of length %d truncated to 255 chars.', address, len(title))
-		title = title[:255]
-
-	if len(description) > 255:
-		logging.warning('Description for URL %s of length %d truncated to 255 chars.', address, len(description))
-		description = description[:255]
 
 	# build a dict representing the new row that we will insert
 	row = {
@@ -84,11 +88,14 @@ for row in reader:
 	try:
 		result = bookmarks.insert().execute(**row)
 	except sqlalchemy.exceptions.SQLError, e:
-		logging.error('Failed to add %s : %s', address, e.args)
-		pass
+		logging.error('SQL error for address %s : %s', address, e.args)
+		sql_errors += 1
 
 	# if the query inserted a row then we can go ahead and add the tags
 	if result.rowcount == 1:
+		print '.',
+		bookmark_count += 1
+
 		# grab the id of the bookmark we just inserted
 		bId = result.lastrowid
 
@@ -97,14 +104,9 @@ for row in reader:
 		tags = tags.split(tag_delimiter)
 
 		for tag in tags:
+
 			# remove possible whitespace
 			tag = tag.strip()
-
-			# the tag field in the db is only 32 chars wide.  if this tag is wider
-			# truncate the tag name and write a log message.
-			if len(tag) > 32:
-				logging.warning('Tag for bId %d of length %d truncated to 32 chars.', bId, len(tag))
-				tag = tag[:32]
 
 			row = {'bId': bId, 'tag': tag}
 
@@ -114,5 +116,14 @@ for row in reader:
 			try:
 				result = tags_tbl.insert().execute(**row)
 			except sqlalchemy.exceptions.SQLError, e:
-				logging.error('For bId %d : %s', bId, e.args)
-				pass
+				logging.error('SQL error for bId %d : %s', bId, e.args)
+				sql_errors += 1
+			else:
+				if result.rowcount == 1:
+					tag_count += 1
+
+print '\n'
+print 'Bookmarks added: %d' % bookmark_count
+print 'Tags added: %d' % tag_count
+print 'SQL errors issued: %d' % sql_errors
+print '\nSee import_csv.log for SQL warning and error details.'
