@@ -22,15 +22,15 @@ import sqlalchemy
 ##### --------------- SET THESE VALUES CORRECTLY ------------------- #####
 field_delimiter = '^'
 line_terminator = '\n'
-tag_delimiter = '|'  # specify the delimiter for the items in tag column
-user_id = '8'  # the id of the user to who the bookmarks will be assigned
+tag_delimiter = ','  # specify the delimiter for the items in tag column
+user_id = '19'  # the id of the user to who the bookmarks will be assigned
 ##### -------------------------------------------------------------- #####
 
 # parse the file passed in as the last argument
 reader = csv.reader(open(sys.argv[-1]), delimiter=field_delimiter, lineterminator=line_terminator)
 
 # setup database connectivity
-db = sqlalchemy.create_engine('mysql://root:tahiti3@localhost/oer', convert_unicode=True)
+db = sqlalchemy.create_engine('mysql://root:ccadmin@localhost/oer', convert_unicode=True)
 metadata = sqlalchemy.MetaData(db)
 bookmarks = sqlalchemy.Table('sc_bookmarks', metadata, autoload=True)
 tags_tbl = sqlalchemy.Table('sc_tags', metadata, autoload=True)
@@ -83,28 +83,29 @@ for title, address, description, tags in reader:
 		# grab the id of the bookmark we just inserted
 		bId = result.lastrowid
 
-		# work through the list of tags that were split out from the row above
-		# the delimiter is a pipe symbol
-		tags = tags.split(tag_delimiter)
+		if len(tags.strip()) != 0:
+			# work through the list of tags that were split out from the row above
+			# the delimiter is a pipe symbol
+			tags = tags.split(tag_delimiter)
 
-		for tag in tags:
+			for tag in tags:
 
-			# remove possible whitespace
-			tag = tag.strip()
+				# remove possible whitespace
+				tag = tag.strip()
 
-			row = {'bId': bId, 'tag': tag}
+				row = {'bId': bId, 'tag': tag}
 
-			# the import file may possible have the same tag listed twice for a given item,
-			# which will raise an exception due to a duplicate key violation in mysql.  just
-			# ignore such errors
-			try:
-				result = tags_tbl.insert().execute(**row)
-			except sqlalchemy.exceptions.SQLError, e:
-				logging.error('SQL error for bId %d : %s', bId, e.args)
-				sql_errors += 1
-			else:
-				if result.rowcount == 1:
-					tag_count += 1
+				# the import file may possible have the same tag listed twice for a given item,
+				# which will raise an exception due to a duplicate key violation in mysql.  just
+				# ignore such errors
+				try:
+					result = tags_tbl.insert().execute(**row)
+				except sqlalchemy.exceptions.SQLError, e:
+					logging.error('SQL error for bId %d : %s', bId, e.args)
+					sql_errors += 1
+				else:
+					if result.rowcount == 1:
+						tag_count += 1
 
 print '\n'
 print 'Bookmarks added: %d' % bookmark_count

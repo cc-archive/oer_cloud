@@ -8,6 +8,10 @@ from lxml import etree
 import warnings
 import sqlalchemy
 
+##### -------------- SET THIS --------------- #####
+user_id = '16'  # user who will own these bookmarks
+##### --------------------------------------- #####
+
 # the RSS file to import
 import_file = sys.argv[-1]
 
@@ -16,8 +20,8 @@ import_file = sys.argv[-1]
 # just been issued to stderr
 warnings.filterwarnings(action='error', message='.*')
 
-# setup the database
-db = sqlalchemy.create_engine('mysql://root:tahiti3@localhost/oer', convert_unicode=True)
+# setup database connectivity
+db = sqlalchemy.create_engine('mysql://root:ccadmin@localhost/oer', convert_unicode=True)
 metadata = sqlalchemy.MetaData(db)
 bookmarks = sqlalchemy.Table('sc_bookmarks', metadata, autoload=True)
 tags = sqlalchemy.Table('sc_tags', metadata, autoload=True)
@@ -41,9 +45,6 @@ namespaces = {
 bookmark_count = 0
 tag_count = 0
 sql_errors = 0
-truncated_titles = 0
-truncated_descriptions = 0
-truncated_tags = 0
 
 # parse the XML file .. in this case it's an RSS feed
 xml_doc = etree.parse(import_file)
@@ -56,21 +57,9 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 	time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 	hash = md5.new(address).hexdigest()
 
-	# the title and address fields in the db is only 255 chars wide.
-	# truncate the values if they are larger than 255 and write a log message.
-	if len(title) > 255:
-		logging.warning('Title for URL %s of length %d truncated to 255 chars.', address, len(title))
-		title = title[:255]
-		truncated_titles += 1
-
-	if len(description) > 255:
-		logging.warning('Description for URL %s of length %d truncated to 255 chars.', address, len(description))
-		description = description[:255]
-		truncated_descriptions += 1
-
 	# build a dict representing the new row that we will insert
 	row = {
-		'uId': '16',
+		'uId': user_id, 
 		'bTitle': title,
 		'bAddress': address,
 		'bDescription': description,
@@ -93,13 +82,6 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 		bId = result.lastrowid
 		for tag in item.xpath("dc:subject", namespaces):
 			
-			# the tag field in the db is only 32 chars wide.  if this tag is wider
-			# truncate the tag name and write a log message.
-			if len(tag.text) > 32:
-				logging.warning('Tag for bId %d of length %d truncated to 32 chars.', bId, len(tag.text))
-				tag.text = tag.text[:32]
-				truncated_tags += 1
-
 			row = {'bId': bId, 'tag': tag.text}
 
 			# the import file may possible have the same tag listed twice for a given item,
@@ -118,8 +100,5 @@ for item in xml_doc.xpath("/rdf:RDF/default:item", namespaces):
 print '\n'
 print 'Bookmarks added: %d' % bookmark_count
 print 'Tags added: %d' % tag_count
-print 'Bookmark titles truncated: %d' % truncated_titles
-print 'Bookmark descriptions truncated: %d' % truncated_descriptions
-print 'Tag titles truncated: %d' % truncated_tags
 print 'SQL errors/warnings issued: %d' % sql_errors
 print '\nSee import_csv.log for SQL warning and error details.'
