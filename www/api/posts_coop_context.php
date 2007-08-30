@@ -18,17 +18,19 @@ $tags = $tagservice->getAllTags();
 // Set up the XML file and output all the posts.
 header('Content-Type: text/xml');
 echo <<<HEADER
-<?xml version='1.0' encoding='UTF-8' ?>
-<GoogleCustomizations version='1.0'>
-	<CustomSearchEngine volunteers='true' keywords='oai' Title='OER Search' Description='Test Engine for OER import.' language='en'>
-		<Context refinementsTitle='Refine results for \$q:'>
-			<BackgroundLabels>
-				<Label name='_cse_we9jedjkeci' mode='FILTER' />
-				<Label name='_cse_exclude_we9jedjkeci' mode='ELIMINATE' />
-			</BackgroundLabels>
+<?xml version="1.0" encoding="UTF-8" ?>
+<GoogleCustomizations version="1.0">
+  <CustomSearchEngine volunteers="true" keywords="oai" 
+  Title="OER Search" Description="Test Engine for OER import." language="en">
+    <Context refinementsTitle="Refine results for \$q:">
+    </Context>
+    <LookAndFeel nonprofit="true" />
+
+  </CustomSearchEngine>
 
 HEADER;
 
+/*
 foreach ($tags as $tag) {
 	# don't output system generated tags
 	if ( substr($bTag, 0, 7) != "system:" ) {
@@ -45,7 +47,23 @@ FACET;
 	}
 }
 
+<<<<<<< .mine
+*/
+
+=======
+>>>>>>> .r6993
+// generate inclusion URLs for the bookmarks
+$bookmarks =& $bookmarkservice->getBookmarks(0, NULL, NULL, $tag);
+$page_count = (len($bookmarks) // 5000) + 1;
+
 echo <<<FOOTER
+<<<<<<< .mine
+    <!-- include the OER Cloud annotations ${page_count} -->
+    <Include type="Annotations" 
+       href="http://oercloud.creativecommons.org/api/posts/coop" />
+
+</GoogleCustomizations>
+=======
 		</Context>
 		<LookAndFeel nonprofit='true' />
 	</CustomSearchEngine>
@@ -54,6 +72,7 @@ echo <<<FOOTER
 	<Include type='Annotations' href='http://oercloud.creativecommons.org/api/posts/coop' />
 </GoogleCustomizations>
 
+>>>>>>> .r6993
 FOOTER;
 
 ?>

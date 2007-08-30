@@ -32,6 +32,8 @@ setup(
 
     entry_points = { 'console_scripts':
                      ['import_nsta = cc_oer.import_scripts:nsta',
+                      'import_oerc = cc_oer.import_scripts:oerc',
+                      'import_rss = cc_oer.rss:rss_rdf',
                       ],
                      },
 
