@@ -47,32 +47,28 @@ FACET;
 	}
 }
 
-<<<<<<< .mine
 */
 
-=======
->>>>>>> .r6993
 // generate inclusion URLs for the bookmarks
 $bookmarks =& $bookmarkservice->getBookmarks(0, NULL, NULL, $tag);
 $page_count = (len($bookmarks) // 5000) + 1;
 
+echo "<!-- include the OER Cloud annotations ${page_count} -->\n";
+
+for ($i = 0; $i < $page_count; $i++) {
+
+    echo """
+<Include type="Annotations" 
+       href="http://oercloud.creativecommons.org/api/posts/coop?p=$i" />
+""";
+}
+
 echo <<<FOOTER
-<<<<<<< .mine
     <!-- include the OER Cloud annotations ${page_count} -->
     <Include type="Annotations" 
        href="http://oercloud.creativecommons.org/api/posts/coop" />
 
 </GoogleCustomizations>
-=======
-		</Context>
-		<LookAndFeel nonprofit='true' />
-	</CustomSearchEngine>
-
-	<!-- include the OER Cloud annotations -->
-	<Include type='Annotations' href='http://oercloud.creativecommons.org/api/posts/coop' />
-</GoogleCustomizations>
-
->>>>>>> .r6993
 FOOTER;
 
 ?>
