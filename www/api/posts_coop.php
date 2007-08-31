@@ -6,13 +6,6 @@ require_once('../header.inc.php');
 
 $bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
 
-# Check to see if a tag was specified.
-if ( isset($_REQUEST['cse']) && (trim($_REQUEST['cse']) != "") ) {
-	$cse = trim($_REQUEST['cse']);
-} else {
-	$cse = "_cse_we9jedjkeci";
-}
-
 # set a proper content-type header
 header('Content-Type: text/xml');
 
@@ -24,9 +17,11 @@ echo <<<XML
 XML;
 
 # Get the posts relevant to the passed-in variables.
-$bookmarks = $bookmarkservice->getAllBookmarks();
+$page = $_GET['p'];
+$bookmarks = $bookmarkservice->getBookmarks($start=$page * 5000, $perpage=5000);
+//getAllBookmarks();
 
-foreach ( $bookmarks as $bookmark ) {
+foreach ( $bookmarks['bookmarks'] as $bookmark ) {
 
 	# Get the bookmark URL and make it a wildcard
 	$bookmark_url = filter($bookmark['bAddress'], 'xml');
@@ -38,14 +33,11 @@ foreach ( $bookmarks as $bookmark ) {
 	}
 
 	echo "		<Annotation about='$bookmark_url' score='1'>\n";
-
-	# Add a "lable" to identify which coop this goes with
-	echo "			<Label name='$cse' />\n";
+	echo "		<Label name='_cse_cclearn_oe_search' />\n";
 
     # Output the tags
-	$bTags = explode(",", $bookmark['bTags']);
-	if ( count($bTags) > 0 ) {
-		foreach ( $bTags as $bTag ) {
+	if ( count($bookmark['tags']) > 0 ) {
+		foreach ( $bookmark['tags'] as $bTag ) {
 			# ignore tags used by the system
 			if ( substr($bTag, 0, 7) != "system:" ) {
 				# if there are any single or double quotes in the tag, turn them into their html entities
