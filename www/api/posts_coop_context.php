@@ -30,12 +30,31 @@ echo <<<HEADER
     <BackgroundLabels>
 <Label name='_cse_cclearn_oe_search' mode="FILTER" />
     </BackgroundLabels>
+HEADER;
+
+// spit out the facets to make labels show up
+foreach ($tags as $tag) {
+	# don't output system generated tags
+	if ( substr($tag['tag'], 0, 7) != "system:" ) {
+	   # convert special chars to character entities
+	   $tag['tag'] = filter($tag['tag'], "xml");
+	   echo <<<FACET
+	   <Facet>
+		<FacetItem title='{$tag['tag']}'>
+			   <Label name='{$tag['tag']}' mode='FILTER' />
+		</FacetItem>
+	   </Facet>
+FACET;
+	}
+}
+
+echo <<<CLOSE_HEADER
+
     </Context>
     <LookAndFeel nonprofit="true" />
 
   </CustomSearchEngine>
-
-HEADER;
+CLOSE_HEADER;
 
 // generate inclusion URLs for the bookmarks
 $bookmarks =& $bookmarkservice->getAllBookmarks();
