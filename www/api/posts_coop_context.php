@@ -30,6 +30,7 @@ echo <<<HEADER
     <BackgroundLabels>
 <Label name='_cse_cclearn_oe_search' mode="FILTER" />
     </BackgroundLabels>
+	   <Facet>
 HEADER;
 
 // spit out the facets to make labels show up
@@ -39,16 +40,15 @@ foreach ($tags as $tag) {
 	   # convert special chars to character entities
 	   $tag['tag'] = filter($tag['tag'], "xml");
 	   echo <<<FACET
-	   <Facet>
 		<FacetItem title='{$tag['tag']}'>
 			   <Label name='{$tag['tag']}' mode='FILTER' />
 		</FacetItem>
-	   </Facet>
 FACET;
 	}
 }
 
 echo <<<CLOSE_HEADER
+	   </Facet>
 
     </Context>
     <LookAndFeel nonprofit="true" />
