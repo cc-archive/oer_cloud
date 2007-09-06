@@ -5,6 +5,7 @@
 require_once('../header.inc.php');
 
 $bookmarkservice =& ServiceFactory::getServiceInstance('BookmarkService');
+$userservice =& ServiceFactory::getServiceInstance('UserService');
 
 # set a proper content-type header
 header('Content-Type: text/xml');
@@ -34,6 +35,10 @@ foreach ( $bookmarks['bookmarks'] as $bookmark ) {
 
 	echo "		<Annotation about='$bookmark_url' score='1'>\n";
 	echo "		<Label name='_cse_cclearn_oe_search' />\n";
+
+	# output the provider as a label
+	$provider = $userservice->getUser($bookmark['uId'])["username"];
+	echo "		<Label name='$provider' />\n";
 
     # Output the tags
 	if ( count($bookmark['tags']) > 0 ) {
