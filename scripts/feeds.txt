@@ -1,0 +1,16 @@
+Professional Education Organization International
+http://www.peoi.org/rss/rsspeoien.xml
+http://www.peoi.org/rss/rsspeoisp.xml
+
+dgCommunity
+http://topics.developmentgateway.org/openeducation/rc/publish.do
+
+Cnx.org
+http://rhaptos.org/docs/apis/metadataharvesting
+http://cnx.org/content/recent.rss
+
+MIT OCW
+http://ocw.mit.edu/OcwWeb/rss/all/mit-allcourses.xml
+
+iBerry
+http://iberry.widged.com/cms/ocw/feed
