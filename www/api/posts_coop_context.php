@@ -19,6 +19,7 @@ else
 
 // Get the list of tags
 $tags = $tagservice->getAllTags();
+$users = $userservice->getAllUsers();
 
 // Set up the XML file and output all the posts.
 header('Content-Type: text/xml');
@@ -32,6 +33,19 @@ echo <<<HEADER
     </BackgroundLabels>
 	   <Facet>
 HEADER;
+
+// spit out the usernames as facets
+foreach ($users as $user) {
+
+	if ($user['username'] == 'admin') continue;
+
+	echo <<<FACET
+	<FacetItem title='{$user['username']}'>
+		   <Label name='{$user['username']}' mode='FILTER' />
+	</FacetItem>
+FACET;
+}
+
 
 // spit out the facets to make labels show up
 foreach ($tags as $tag) {
@@ -58,7 +72,7 @@ CLOSE_HEADER;
 
 // generate inclusion URLs for the bookmarks
 $bookmarks =& $bookmarkservice->getAllBookmarks();
-$page_count = (count($bookmarks) / 5000) + 1;
+$page_count = (count($bookmarks) / 2500) + 1;
 
 echo "<!-- include the OER Cloud annotations -->\n";
 

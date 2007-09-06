@@ -19,7 +19,7 @@ XML;
 
 # Get the posts relevant to the passed-in variables.
 $page = $_GET['p'];
-$bookmarks = $bookmarkservice->getBookmarks($start=$page * 5000, $perpage=5000);
+$bookmarks = $bookmarkservice->getBookmarks($start=$page * 2500, $perpage=2500);
 //getAllBookmarks();
 
 foreach ( $bookmarks['bookmarks'] as $bookmark ) {
@@ -37,7 +37,8 @@ foreach ( $bookmarks['bookmarks'] as $bookmark ) {
 	echo "		<Label name='_cse_cclearn_oe_search' />\n";
 
 	# output the provider as a label
-	$provider = $userservice->getUser($bookmark['uId'])["username"];
+	$provider = $userservice->getUser($bookmark['uId']);
+	$provider = $provider["username"];
 	echo "		<Label name='$provider' />\n";
 
     # Output the tags
