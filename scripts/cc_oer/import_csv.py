@@ -11,6 +11,7 @@ from datetime import datetime
 import logging
 import warnings
 import csv  # http://docs.python.org/lib/module-csv.html
+from optparse import OptionParser
 import sqlalchemy
 
 # WARNING: this script expects that there will be 4 columns and in this exact order:
@@ -25,6 +26,19 @@ line_terminator = '\n'
 tag_delimiter = ','  # specify the delimiter for the items in tag column
 user_id = '19'  # the id of the user to who the bookmarks will be assigned
 ##### -------------------------------------------------------------- #####
+
+parser = OptionParser()
+parser.add_option('-u', '--user', dest='user', help='Id of user to whom imported bookmarks will be assigned.', metavar='USERID')
+parser.add_option('-d', '--delim', dest='delimiter', help='Character that delimits the fields of each line.', metavar='DELIM')
+parser.add_option('-l', '--lterm', dest='lineterm', help='Character that terminates each line.', metavar='LINETERM')
+parser.add_option('-t', '--tsep', dest='tagseparator', help='Character that separates each tag in the tags column.', metavar='TAGSEP')
+(options, args) = parser.parse_args()
+
+if ! options.user
+
+
+exit()
+
 
 # parse the file passed in as the last argument
 reader = csv.reader(open(sys.argv[-1]), delimiter=field_delimiter, lineterminator=line_terminator)
