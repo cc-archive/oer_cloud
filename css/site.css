@@ -1,0 +1,91 @@
+body {
+	font-family: "Lucida Grande", verdana, sans-serif;
+}
+
+img {
+	border: none;
+}
+
+#header {
+	position: relative;
+	height: 6em;
+	background: #FFF url('../images/cc-header-bg.png') bottom repeat-x;
+}
+
+#headerLogo {
+	position: absolute;
+	left: 1em;
+	line-height: 5em;
+}
+
+#headerInfoBar {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	color: #ffffff;
+	background-color: #000000;
+}
+
+#headerInfoBar a {
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 75%;
+	text-decoration: none;
+}
+
+#headerInfoBar a:hover {
+	text-decoration: underline;
+}
+
+#headerInfoBar a:visited {
+	color: #ffffff;
+}
+
+#headerLinks {
+	margin-left: 1ex;
+}
+
+#footer {
+	clear: both;
+	background-color: #000000;
+	color: #ffffff;
+	margin-top: 1em;
+	padding: .25ex;
+	font-size: 0.9em;
+	text-align: center;
+}
+
+#systemMsgs {
+        position: absolute;
+        width: 59%;
+        margin-left: 40%;
+        top: 0;
+        height: 20px;
+        font-size: 8pt;
+        line-height: 20px;
+        font-family: Arial, Verdana;
+        font-weight: bold;
+        text-align: right;
+        padding-right: 1ex;
+}
+
+.fieldHeader {
+	float: left;
+	border: 1px solid #000000;
+	padding: .5ex;
+	font-weight: bold;
+}
+
+.fieldData {
+	float: left;
+	padding: .75ex;
+	font-size: small;
+}
+
+div.bgDark div {
+	background-color: #e0e0e0;
+}
+
+div.bgLight div {
+	background-color: #ffffff;
+}
