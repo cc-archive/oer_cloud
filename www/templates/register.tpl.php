@@ -19,6 +19,16 @@ window.onload = function() {
     <td id="availability"></td>
 </tr>
 <tr>
+    <th align="left"><label for="name"><?php echo T_('Full name / Organization'); ?></label></th>
+    <td><input type="text" id="name" name="name" size="50" class="required" /></td>
+    <td></td>
+</tr>
+<tr>
+    <th align="left"><label for="homepage"><?php echo T_('Homepage'); ?></label></th>
+    <td><input type="text" id="homepage" name="homepage" size="50" /></td>
+    <td></td>
+</tr>
+<tr>
     <th align="left"><label for="password"><?php echo T_('Password'); ?></label></th>
     <td><input type="password" id="password" name="password" size="20" class="required" /></td>
     <td></td>

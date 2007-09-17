@@ -27,6 +27,7 @@ $templateservice =& ServiceFactory::getServiceInstance('TemplateService');
 $tplVars = array();
 if ($_POST['submitted']) {
     $posteduser = trim(utf8_strtolower($_POST['username']));
+    $postedname = trim($_POST['name']);
     $captcha_invalid = false;
 
     // validate recaptcha
@@ -58,6 +59,10 @@ if ($_POST['submitted']) {
     } elseif ($userservice->isReserved($posteduser)) {
         $tplVars['error'] = T_('This username has been reserved, please make another choice.');
 
+    // Check if name is empty
+    } elseif (empty($postedname)) {
+        $tplVars['error'] = T_('You must enter a Full Name.');
+    
     // Check if username already exists
     } elseif ($userservice->getUserByUsername($posteduser)) {
         $tplVars['error'] = T_('This username already exists, please make another choice.');
@@ -71,10 +76,10 @@ if ($_POST['submitted']) {
         $tplVars['error'] = T_('E-mail address is not valid. Please try again.');
 
     // Register details
-    } elseif ($userservice->addUser($posteduser, $_POST['password'], $_POST['email'])) {
+    } elseif ($userservice->addUser($posteduser, $postedname, $_POST['homepage'], $_POST['password'], $_POST['email'])) {
 		/* Send the user an activation email */
 
-		# user the codes existing function for creating random password to create a 
+		# use the sites existing function for creating random password to create a 
 		# hopefully random activation key and then insert it into the users record
 		$activationKey = $userservice->_randompassword();
 		$activationUrl = "{$root}activate/?key=$activationKey";

@@ -365,11 +365,13 @@ class UserService {
         return true;
     }
 
-    function addUser($username, $password, $email) {
+    function addUser($username, $name, $homepage, $password, $email) {
         // Set up the SQL UPDATE statement.
         $datetime = gmdate('Y-m-d H:i:s', time());
         $password = $this->sanitisePassword($password);
         
+		$homepage = ("" == trim($homepage)) ? "" : trim($homepage);
+
         // Get the client's IP address and the date; note that the date is in GMT.
         if (getenv('HTTP_CLIENT_IP'))
             $ip = getenv('HTTP_CLIENT_IP');
@@ -381,6 +383,8 @@ class UserService {
                 
         $values = array(
             'username'  => $username,
+            'name'      => $name,
+            'homepage'  => $homepage,
             'password'  => $password,
             'email'     => $email,
             'uDatetime' => $datetime,

@@ -28,9 +28,9 @@
 $dbtype = 'mysql';
 $dbhost = '127.0.0.1';
 $dbport = '3306';
-$dbuser = 'scuttle';
-$dbpass = '';
-$dbname = 'oer';
+$dbuser = 'oercloud';
+$dbpass = 'oercloudadmin';
+$dbname = 'oercloud';
 
 ## OPTIONAL: Configure recaptcha
 $use_recaptcha = true;
@@ -102,8 +102,8 @@ $defaultPerPage     = 10;
 $defaultRecentDays  = 14;
 $defaultOrderBy     = 'date_desc';
 $TEMPLATES_DIR      = dirname(__FILE__) .'/templates/';
-#$root               = 'http://oercloud.creativecommons.org/';
-$root               = 'http://localhost/cc/oercloud/www/';
+$root               = 'http://oercloud.creativecommons.org/';
+#$root               = 'http://localhost/cc/oercloud/www/';
 $cookieprefix       = 'CC_OER';
 $tableprefix        = 'sc_';
 $adminemail         = 'webmaster@creativecommons.org';
