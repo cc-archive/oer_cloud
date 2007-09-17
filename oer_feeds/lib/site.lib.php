@@ -140,4 +140,69 @@ function addFeed () {
 
 	##------------------------------------------------------------------##
 
+# does this user have rights to enter?
+function validateUser($user, $pass) {
+	
+	global $db;
+
+	# clear out the session variables
+	unset($_SESSION['authorized']);
+	unset($_SESSION['ipaddress']);
+
+	# trim the input fields
+	$user = trim($user);
+	$pass = trim($pass);
+
+	# for the moment we only want to allow the admin user
+	if ( $user != "admin" ) {
+		return false;
+	}
+
+	# encrypt password
+	$encPassword = sha1($pass);
+
+	$sql = "
+		SELECT * FROM sc_users
+		WHERE username = '$user'
+			AND password = '$encPassword'
+	";
+	$db->SelectOne($sql);
+	if ( $db->_rowCount == 1 ) {
+		$userRecord = $db->_row;
+
+		# if one record was returned then a user matching the credentials they
+		# supplied was found in the database.  give them access.
+		$_SESSION['authorized'] = "access_granted";
+		$_SESSION['ipaddress'] = $_SERVER['REMOTE_ADDR'];
+		return true;
+	} else {
+		# not a valid user (not found in db)
+		return false;
+	}
+
+	$db->Close();
+
+}
+
+	##------------------------------------------------------------------##
+
+function requireLogin() {
+
+	global $config;
+
+	if ( 
+		isset($_SESSION['authorized']) && 
+		($_SESSION['authorized'] == "access_granted") &&
+		isset($_SESSION['ipaddress']) && 
+		($_SESSION['ipaddress'] == $_SERVER['REMOTE_ADDR'])
+	) {
+		return true;
+	} else {
+		header("Location: {$config->_rootUri}/login.php");
+	}
+	
+}
+
+	##------------------------------------------------------------------##
+
 ?>

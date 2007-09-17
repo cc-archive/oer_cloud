@@ -11,6 +11,9 @@
 	<div id='headerLogo'>
 		<a href='{$config->_rootUri}/'><img style='vertical-align: middle;' src='{$config->_imgUri}/cc-learn.png' alt='ccLearn'/></a>
 	</div>
+	<div id='headerRight'>
+		<a href='login.php?logout'>[log out]</a>
+	</div>
 	<div id='headerInfoBar'>
 		<div id='headerLinks'>
 			<strong>OER Feeds</strong>

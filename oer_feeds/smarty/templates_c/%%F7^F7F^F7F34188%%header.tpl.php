@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.14, created on 2007-09-07 15:41:53
+<?php /* Smarty version 2.6.14, created on 2007-09-17 11:57:08
          compiled from header.tpl */ ?>
 <?php echo '<?xml'; ?>
  version='1.0' <?php echo '?>'; ?>
@@ -17,6 +17,9 @@
 		<a href='<?php echo $this->_tpl_vars['config']->_rootUri; ?>
 /'><img style='vertical-align: middle;' src='<?php echo $this->_tpl_vars['config']->_imgUri; ?>
 /cc-learn.png' alt='ccLearn'/></a>
+	</div>
+	<div id='headerRight'>
+		<a href='login.php?logout'>[log out]</a>
 	</div>
 	<div id='headerInfoBar'>
 		<div id='headerLinks'>

@@ -12,6 +12,9 @@
 # and libraries are included
 include("config.php");
 
+# you must login to view this page
+requireLogin();
+
 # the user has selected to modify an existing feed - either modify or delete
 if ( isset($_GET['doModifyFeed']) ) {
 	switch ( $_GET['feedAction'] ) {

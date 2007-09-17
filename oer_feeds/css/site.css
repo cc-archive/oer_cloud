@@ -18,6 +18,19 @@ img {
 	line-height: 5em;
 }
 
+#headerRight {
+	padding-right: 1ex;
+	text-align: right;
+}
+
+#headerRight a {
+	text-decoration: none;
+}
+
+#headerRight a:visited {
+	color: #ffffff;
+}
+
 #headerInfoBar {
 	position: absolute;
 	bottom: 0px;
@@ -89,3 +102,76 @@ div.bgDark div {
 div.bgLight div {
 	background-color: #ffffff;
 }
+
+.loginBox {
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 150px;
+	width: 500px; 
+	height: 130px;
+}
+
+.loginBoxFoot {
+	position: absolute;
+	width: 484px;
+	left: 4px;
+	height: 25px;
+	bottom: 0;
+	text-align: right;
+}
+
+.loginBoxHead {
+	color: #668a00;
+	text-align: center;
+	padding: 10px;
+	font-size: large;
+}
+
+.loginBoxLabels {
+	position: absolute;
+	left: 0;
+	width: 200px;
+	margin: 2px;
+}
+
+.loginBoxFields {
+	position: absolute;
+	width: 290px;
+	left: 200px;
+	margin: 2px;
+}
+
+.loginBoxField {
+	color: #668a00;
+	height: 20px;
+	font-size: x-small;
+	border: 1px solid #668a00;
+	border-width: thin;
+	padding: 4px;
+	margin: 2px;
+}
+
+.loginBoxLabel {
+	color: #668a00;
+	height: 20px;
+	text-align: right;
+	font-size: x-small;
+	border: 1px solid #668a00;
+	border-width: thin;
+	padding: 4px;
+	margin: 2px;
+}
+
+.loginInputField {
+	background-color: #f2f7fb;
+}
+
+.loginButton {
+	font-size: 10px;
+	background-color: #668a00;
+	color: #ffffff;
+	margin-top: 1em;
+	margin-right: 6px;
+}
+
