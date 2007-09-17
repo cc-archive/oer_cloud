@@ -6,16 +6,16 @@
 		<div>
 			<div class='fieldHeader' style='width: 2%; text-align: center;'>X</div>
 			<div class='fieldHeader' style='width: 40%;'>URL</div>
-			<div class='fieldHeader' style='width: 20%;'>User</div>
-			<div class='fieldHeader' style='width: 15%;'>Feed type</div>
-			<div class='fieldHeader' style='width: 15%;'>Last import</div>
+			<div class='fieldHeader' style='width: 30%;'>User</div>
+			<div class='fieldHeader' style='width: 10%;'>Feed type</div>
+			<div class='fieldHeader' style='width: 10%;'>Last import</div>
 		</div>
 {if $feeds}
 	{foreach from=$feeds item=feed}
 		<div style='clear: left;' class='{cycle values="bgDark,bgLight"}'>
 			<div class='fieldData' style='border-color: #ffffff; width: 2%;'><input type='radio' name='feed_id' value='{$feed.id}' /></div>
 			<div class='fieldData' style='width: 40%;'><input type='text' style='width: 95%;' name='url-{$feed.id}' value='{$feed.url}' /></div>
-			<div class='fieldData' style='width: 20%;'>
+			<div class='fieldData' style='width: 30%;'>
 				<select name='user_id-{$feed.id}'>
 		{foreach from=$users item=user}
 			{if $user.uId == $feed.user_id}
@@ -26,7 +26,7 @@
 		{/foreach}
 				</select>
 			</div>
-			<div class='fieldData' style='width: 15%;'>
+			<div class='fieldData' style='width: 10%;'>
 				<select name='feed_type-{$feed.id}'>
 		{foreach from=$feedTypes key=feedKey item=feedType}
 			{if $feedKey == $feed.feed_type}
@@ -38,7 +38,7 @@
 				</select>
 			</div>
 			</div>
-			<div class='fieldData' style='width: 15%; font-size: x-small;'>{$feed.last_import}</div>
+			<div class='fieldData' style='width: 10%; font-size: x-small;'>{$feed.last_import}</div>
 		</div>
 	{/foreach}
 {else}
@@ -62,14 +62,14 @@
 			<div><strong>Add a new feed</strong></div>
 			<div class='fieldData' style='width: 2%;'></div>
 			<div class='fieldData' style='width: 40%'><input type='text' style='width: 95%;' name='url' /></div>
-			<div class='fieldData' style='width: 20%;'>
+			<div class='fieldData' style='width: 30%;'>
 				<select name='user_id'>
 		{foreach from=$users item=user}
 					<option value='{$user.uId}'>{$user.name}</option>
 		{/foreach}
 				</select>
 			</div>
-			<div class='fieldData' style='width: 15%;'>
+			<div class='fieldData' style='width: 10%;'>
 				<select name='feed_type'>
 		{foreach from=$feedTypes key=feedKey item=feedType}
 					<option value='{$feedKey}'>{$feedType}</option>

@@ -54,18 +54,17 @@ $smarty->assign( "feedTypes",
 	array(
 		"atom10" => "Atom 1.0",
 		"rss090" => "RSS 0.90",
-		"rss091n" => "Netscape RSS 0.91",
-		"rss091u" => "Userland RSS 0.91",
+		"rss091" => "RSS 0.91",
 		"rss10" => "RSS 1.0",
 		"rss092" => "RSS 0.92",
 		"rss093" => "RSS 0.93",
 		"rss094" => "RSS 0.94",
 		"rss20" => "RSS 2.0",
-		"rss" => "RSS (unknown version)",
+		"rss" => "RSS (?)",
 		"atom01" => "Atom 0.1",
 		"atom02" => "Atom 0.2",
 		"atom03" => "Atom 0.3",
-		"atom" => "Atom (unknown version)",
+		"atom" => "Atom (?)",
 		"cdf" => "CDF",
 		"hotrss" => "Host RSS"
 	)
@@ -92,7 +91,7 @@ if ( $db->_rowCount > 0 ) {
 	# loop through the results so that we can change the Unix timestamp
 	# of the last_import to a human-readable date
 	foreach ( $db->_rows AS $key => $feed ) {
-		if ( $db->_rows[$key]['last_import'] ) {
+		if ( $db->_rows[$key]['last_import'] ) {q
 			$db->_rows[$key]['last_import'] = date("D, M jS, Y", $feed['last_import']);
 		} else {
 			$db->_rows[$key]['last_import'] = "Never";

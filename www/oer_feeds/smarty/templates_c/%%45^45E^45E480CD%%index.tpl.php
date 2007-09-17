@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.14, created on 2007-09-12 14:47:23
+<?php /* Smarty version 2.6.14, created on 2007-09-17 21:57:26
          compiled from index.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'index.tpl', 15, false),)), $this); ?>
@@ -11,9 +11,9 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'in
 		<div>
 			<div class='fieldHeader' style='width: 2%; text-align: center;'>X</div>
 			<div class='fieldHeader' style='width: 40%;'>URL</div>
-			<div class='fieldHeader' style='width: 20%;'>User</div>
-			<div class='fieldHeader' style='width: 15%;'>Feed type</div>
-			<div class='fieldHeader' style='width: 15%;'>Last import</div>
+			<div class='fieldHeader' style='width: 30%;'>User</div>
+			<div class='fieldHeader' style='width: 10%;'>Feed type</div>
+			<div class='fieldHeader' style='width: 10%;'>Last import</div>
 		</div>
 <?php if ($this->_tpl_vars['feeds']): ?>
 	<?php $_from = $this->_tpl_vars['feeds']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
@@ -26,7 +26,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'in
 			<div class='fieldData' style='width: 40%;'><input type='text' style='width: 95%;' name='url-<?php echo $this->_tpl_vars['feed']['id']; ?>
 ' value='<?php echo $this->_tpl_vars['feed']['url']; ?>
 ' /></div>
-			<div class='fieldData' style='width: 20%;'>
+			<div class='fieldData' style='width: 30%;'>
 				<select name='user_id-<?php echo $this->_tpl_vars['feed']['id']; ?>
 '>
 		<?php $_from = $this->_tpl_vars['users']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
@@ -44,7 +44,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'in
 		<?php endforeach; endif; unset($_from); ?>
 				</select>
 			</div>
-			<div class='fieldData' style='width: 15%;'>
+			<div class='fieldData' style='width: 10%;'>
 				<select name='feed_type-<?php echo $this->_tpl_vars['feed']['id']; ?>
 '>
 		<?php $_from = $this->_tpl_vars['feedTypes']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
@@ -63,7 +63,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'in
 				</select>
 			</div>
 			</div>
-			<div class='fieldData' style='width: 15%; font-size: x-small;'><?php echo $this->_tpl_vars['feed']['last_import']; ?>
+			<div class='fieldData' style='width: 10%; font-size: x-small;'><?php echo $this->_tpl_vars['feed']['last_import']; ?>
 </div>
 		</div>
 	<?php endforeach; endif; unset($_from);  else: ?>
@@ -87,7 +87,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'in
 			<div><strong>Add a new feed</strong></div>
 			<div class='fieldData' style='width: 2%;'></div>
 			<div class='fieldData' style='width: 40%'><input type='text' style='width: 95%;' name='url' /></div>
-			<div class='fieldData' style='width: 20%;'>
+			<div class='fieldData' style='width: 30%;'>
 				<select name='user_id'>
 		<?php $_from = $this->_tpl_vars['users']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['user']):
@@ -98,7 +98,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'cycle', 'in
 		<?php endforeach; endif; unset($_from); ?>
 				</select>
 			</div>
-			<div class='fieldData' style='width: 15%;'>
+			<div class='fieldData' style='width: 10%;'>
 				<select name='feed_type'>
 		<?php $_from = $this->_tpl_vars['feedTypes']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['feedKey'] => $this->_tpl_vars['feedType']):

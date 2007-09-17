@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.14, created on 2007-09-17 11:57:08
+<?php /* Smarty version 2.6.14, created on 2007-09-17 21:40:20
          compiled from header.tpl */ ?>
 <?php echo '<?xml'; ?>
  version='1.0' <?php echo '?>'; ?>
@@ -23,7 +23,7 @@
 	</div>
 	<div id='headerInfoBar'>
 		<div id='headerLinks'>
-			<strong>OER Feeds</strong>
+			<strong>oer feeds</strong>
 		</div>
 		<div id='systemMsgs'><?php echo $this->_tpl_vars['systemMsg']; ?>
 </div>

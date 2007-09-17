@@ -9,8 +9,8 @@
  */
 
 # establish an error reporting level suitable for the site
-#error_reporting (0); # don't show any errors
-error_reporting(E_ALL); # show all errors
+error_reporting (0); # don't show any errors
+#error_reporting(E_ALL); # show all errors
 #error_reporting(E_ALL ^ E_NOTICE); # show all errors except notices
 
 # set various site-wide variables
@@ -18,7 +18,7 @@ error_reporting(E_ALL); # show all errors
 # site constants that don't need to be interpolated in strings and/or
 # are more sensitive
 define("DBHOST", "localhost");          # database host
-define("DBNAME", "oer");       # database name
+define("DBNAME", "oercloud");       # database name
 define("DBUSER", "root");            # database user
 define("DBPASS", "");       # database password
 define("ADODBDIR", "/usr/share/php/adodb"); # adodb db abastractions libs - adodb.sourceforge.net
@@ -35,12 +35,12 @@ $config = new siteConfig;
 
 # variables that need to be interpolated inside strings and HEREDOCs
 # will go in the siteConfig object
-$config->_rootDir			= "/var/www/cc/oercloud/oer_feeds"; # root directory
-$config->_rootUri			= "http://localhost/cc/oercloud/oer_feeds"; # root uri 
-$config->_imgUri			= "{$config->_rootUri}/images"; # where images live
-$config->_cssUri			= "{$config->_rootUri}/css"; # where css files live
-$config->_jsUri				= "{$config->_rootUri}/js"; # where javascript files live
-$config->_smarty			= "{$config->_rootDir}/smarty"; # where smarty files live
+$config->_rootDir		= "/var/www/oercloud.creativecommons.org/www/oer_feeds"; # root directory
+$config->_rootUri		= "http://oercloud.creativecommons.org/oer_feeds"; # root uri 
+$config->_imgUri		= "{$config->_rootUri}/images"; # where images live
+$config->_cssUri		= "{$config->_rootUri}/css"; # where css files live
+$config->_jsUri			= "{$config->_rootUri}/js"; # where javascript files live
+$config->_smarty		= "{$config->_rootDir}/smarty"; # where smarty files live
 $config->_recordsPerPage	= "30"; # number of results per page on food_search.php
 $config->_thisScript		= basename($_SERVER['PHP_SELF']);
 

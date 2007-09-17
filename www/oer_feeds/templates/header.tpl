@@ -16,7 +16,7 @@
 	</div>
 	<div id='headerInfoBar'>
 		<div id='headerLinks'>
-			<strong>OER Feeds</strong>
+			<strong>oer feeds</strong>
 		</div>
 		<div id='systemMsgs'>{$systemMsg}</div>
 	</div>
