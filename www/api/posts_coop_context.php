@@ -23,67 +23,73 @@ $users = $userservice->getAllUsers();
 
 // Set up the XML file and output all the posts.
 header('Content-Type: text/xml');
+
 echo <<<HEADER
 <?xml version="1.0" encoding="UTF-8" ?>
 <GoogleCustomizations version="1.0">
-  <CustomSearchEngine keywords="oai" Title="OE Search" language="en">
-    <Context refinementsTitle="Refine results for \$q:">
-    <BackgroundLabels>
-<Label name='_cse_cclearn_oe_search' mode="FILTER" />
-    </BackgroundLabels>
-	   <Facet>
+	<CustomSearchEngine keywords="oai" Title="Open Education Search" language="en">
+
 HEADER;
 
-// spit out the usernames as facets
-foreach ($users as $user) {
+/*
+ * For the moment we are goingt to comment out the Facet items.
+ * Once issues are resolved with Google, we may put these back
+ * in.
+ */
+echo <<<FACETS
+    <Context>
+    <BackgroundLabels>
+	<Label name='_cse_cclearn_oe_search' mode="FILTER" />
+    </BackgroundLabels>
+FACETS;
 
-	if ($user['username'] == 'admin') continue;
-
-	echo <<<FACET
-	<FacetItem title='{$user['username']}'>
-		   <Label name='{$user['username']}' mode='FILTER' />
-	</FacetItem>
-FACET;
-}
-
-
-// spit out the facets to make labels show up
-foreach ($tags as $tag) {
-	# don't output system generated tags
-	if ( substr($tag['tag'], 0, 7) != "system:" ) {
-	   # convert special chars to character entities
-	   $tag['tag'] = filter($tag['tag'], "xml");
-	   echo <<<FACET
-		<FacetItem title='{$tag['tag']}'>
-			   <Label name='{$tag['tag']}' mode='FILTER' />
-		</FacetItem>
-FACET;
-	}
-}
+#
+#    <Facet>
+#// spit out the usernames as facets
+#foreach ($users as $user) {
+#
+#	if ($user['username'] == 'admin') continue;
+#
+#	echo <<<FACET
+#	<FacetItem title='{$user['username']}'>
+#		   <Label name='{$user['username']}' mode='FILTER' />
+#	</FacetItem>
+#FACET;
+#}
+#
+#
+#// spit out the facets to make labels show up
+#foreach ($tags as $tag) {
+#	# don't output system generated tags
+#	if ( substr($tag['tag'], 0, 7) != "system:" ) {
+#	   # convert special chars to character entities
+#	   $tag['tag'] = filter($tag['tag'], "xml");
+#	   echo <<<FACET
+#		<FacetItem title='{$tag['tag']}'>
+#			   <Label name='{$tag['tag']}' mode='FILTER' />
+#		</FacetItem>
+#FACET;
+#	}
+#}
+#echo "    </Facet>";
+echo " </Context>";
 
 echo <<<CLOSE_HEADER
-	   </Facet>
+		<LookAndFeel nonprofit="true" />
+	</CustomSearchEngine>
 
-    </Context>
-    <LookAndFeel nonprofit="true" />
-
-  </CustomSearchEngine>
 CLOSE_HEADER;
 
 // generate inclusion URLs for the bookmarks
 $bookmarks =& $bookmarkservice->getAllBookmarks();
 $page_count = (count($bookmarks) / 2500) + 1;
 
-echo "<!-- include the OER Cloud annotations -->\n";
+echo "	<!-- include the OER Cloud annotations -->\n";
 
 for ($i = 0; $i < $page_count; $i++) {
-
-    echo " <Include type=\"Annotations\" href=\"http://oercloud.creativecommons.org/api/posts/coop?p=$i\" />";
-
+	echo "	<Include type=\"Annotations\" href=\"http://oercloud.creativecommons.org/api/posts/coop?p=$i\" />\n";
 }
 
-echo <<<FOOTER
-</GoogleCustomizations>
-FOOTER;
+echo "</GoogleCustomizations>\n"
 
 ?>

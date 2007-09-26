@@ -72,8 +72,13 @@ class UserService {
     }
 
     function _randompassword() {
-        $seed = (integer) md5(microtime());
-        mt_srand($seed);
+    	# No need to seed the rand() and mt_rand() functions since v4.2.0
+	# and on top of that type casting an alphanumeric md5 hash as an 
+	# integer won't work and PHP was frequently returning the same seed,
+	# namely , '0', so the passwords weren't random anymore.
+	# http://us.php.net/manual/en/function.mt-srand.php, 
+        #$seed = (integer) md5(microtime());
+        #mt_srand($seed);
         $password = mt_rand(1, 99999999);
         $password = substr(md5($password), mt_rand(0, 19), mt_rand(6, 12));
         return $password;

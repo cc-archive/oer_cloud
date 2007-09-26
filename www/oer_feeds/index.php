@@ -91,7 +91,7 @@ if ( $db->_rowCount > 0 ) {
 	# loop through the results so that we can change the Unix timestamp
 	# of the last_import to a human-readable date
 	foreach ( $db->_rows AS $key => $feed ) {
-		if ( $db->_rows[$key]['last_import'] ) {q
+		if ( $db->_rows[$key]['last_import'] ) {
 			$db->_rows[$key]['last_import'] = date("D, M jS, Y", $feed['last_import']);
 		} else {
 			$db->_rows[$key]['last_import'] = "Never";
