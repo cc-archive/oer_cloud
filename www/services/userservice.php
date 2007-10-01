@@ -553,10 +553,9 @@ class UserService {
 		}
 
 		$sql = sprintf ("
-			SELECT * FROM %susers
+			SELECT * FROM sc_users
 			ORDER BY %s
 			",
-			$GLOBALS['tableprefix'],
 			$orderBy
 		);
 		$queryId = $this->db->sql_query($sql);
@@ -564,6 +563,34 @@ class UserService {
 
 		return $users;
 
+	}
+
+	function editUser() {
+		$sql = sprintf ("
+			UPDATE sc_users SET
+				username = '%s',
+				name = '%s',
+				email = '%s',
+				homepage = '%s',
+				uModified = '%s'
+				%s
+			WHERE uId = '%s'
+			",
+			trim($_POST['username']),
+			trim($_POST['name']),
+			trim($_POST['email']),
+			trim($_POST['homepage']),
+   			gmdate('Y-m-d H:i:s', time()),
+			trim($_POST['password']) ? ", password = '" . $this->sanitisePassword($_POST['password']) . "'" : "",
+			$_POST['userid']
+		);
+		if ( $queryId = $this->db->sql_query($sql) ) {
+			$tplVars['msg'] = "The user was successfully edited";
+			return true;
+		} else {
+			$tplVars['error'] = "There was an error.  The user may not have been edited.";
+			return false;
+		}
 	}
 
 	# make changes to users
@@ -605,24 +632,13 @@ class UserService {
 					break;
 				case "delete":
 					$sql = sprintf ("
-						DELETE %susers.*, %sbookmarks.*, %stags.*
-						FROM %susers LEFT JOIN %sbookmarks
-							ON %susers.uId = %sbookmarks.uId
-						LEFT JOIN %stags
-							ON %sbookmarks.bId = %stags.bId
-						WHERE %susers.uId IN (%s);
+						DELETE sc_users.*, sc_bookmarks.*, sc_tags.*
+						FROM sc_users LEFT JOIN sc_bookmarks
+							ON sc_users.uId = sc_bookmarks.uId
+						LEFT JOIN sc_tags
+							ON sc_bookmarks.bId = sc_tags.bId
+						WHERE sc_users.uId IN (%s);
 						",
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
-						$GLOBALS['tableprefix'],
 						$userIds
 					);
 					$actionMsg = "Deleting the selected user(s)";
@@ -635,16 +651,15 @@ class UserService {
 			# since the update statement for almost all of the possible actions except
 			# delete are almost totally identical except for which field gets updated,
 			# we construct the sql for those actions here, rather than repeating the
-			# below code 6 or 7 times overs.  this isn't necessarily more efficient,
+			# below code 6 or 7 times over.  this isn't necessarily more efficient,
 			# perhaps less so, but it reduces the amount of code
 			if ( ! empty($updateFields) ) {
 				$sql = sprintf ("
-					UPDATE %susers SET
+					UPDATE sc_users SET
 						%s,
 						uModified = '%s'
 					WHERE uId IN (%s)
 					",
-					$GLOBALS['tableprefix'], 
 					$updateFields,
        				gmdate('Y-m-d H:i:s', time()),
 					$userIds

@@ -18,7 +18,7 @@ error_reporting (0); # don't show any errors
 # site constants that don't need to be interpolated in strings and/or
 # are more sensitive
 define("DBHOST", "localhost");          # database host
-define("DBNAME", "oercloud");       # database name
+# database name is defined below
 define("DBUSER", "root");            # database user
 define("DBPASS", "");       # database password
 define("ADODBDIR", "/usr/share/php/adodb"); # adodb db abastractions libs - adodb.sourceforge.net
@@ -35,8 +35,18 @@ $config = new siteConfig;
 
 # variables that need to be interpolated inside strings and HEREDOCs
 # will go in the siteConfig object
-$config->_rootDir		= "/var/www/oercloud.creativecommons.org/www/oer_feeds"; # root directory
-$config->_rootUri		= "http://oercloud.creativecommons.org/oer_feeds"; # root uri 
+
+# toggle some key varabiles based on which host this is running on
+if ( $_SERVER['SERVER_NAME'] == 'localhost' ) {
+	$config->_rootDir	= "/var/www/cc/oercloud/www/oer_feeds"; # root directory
+	$config->_rootUri	= "http://localhost/cc/oercloud/www/oer_feeds"; # root uri 
+	define("DBNAME", "oer");       # database name
+} else {
+	$config->_rootDir	= "/var/www/oercloud.creativecommons.org/www/oer_feeds"; # root directory
+	$config->_rootUri	= "http://oercloud.creativecommons.org/oer_feeds"; # root uri 
+	define("DBNAME", "oercloud");       # database name
+}
+
 $config->_imgUri		= "{$config->_rootUri}/images"; # where images live
 $config->_cssUri		= "{$config->_rootUri}/css"; # where css files live
 $config->_jsUri			= "{$config->_rootUri}/js"; # where javascript files live

@@ -141,12 +141,18 @@ function playerLoad() {
 }
 
 //
-// Function added by Nathan Kinkade
+// Functions added by Nathan Kinkade
 //
 
 function getElement(elemid) {
 	/* the former for Firefox and crew, the latter for IE */
 	return (document.getElementById) ? document.getElementById(elemid) : document.all[elemid];
+}
+
+function trim(string) {
+        string = string.replace(/^\s+/, '');
+        string = string.replace(/\s+$/, '');
+        return string;
 }
 
 function validateModifyUsersForm(formId) {
@@ -163,6 +169,36 @@ function validateModifyUsersForm(formId) {
 		} else {
 			return false;
 		}
+	}
+	return true;
+}
+
+function validateAddUserForm(formId) {
+	var userForm = getElement(formId);
+	if ( trim(userForm.username.value) == '' ) {
+		alert('You must specify a username');
+		return false;
+	}
+	if ( trim(userForm.name.value) == '' ) {
+		alert('You must specify a full name');
+		return false;
+	}
+	if ( trim(userForm.password.value) == '' ) {
+		alert('You must specify a password');
+		return false;
+	}
+	return true;
+}
+
+function validateEditUserForm(formId) {
+	var userForm = getElement(formId);
+	if ( trim(userForm.username.value) == '' ) {
+		alert('You must specify a username');
+		return false;
+	}
+	if ( trim(userForm.name.value) == '' ) {
+		alert('You must specify a full name');
+		return false;
 	}
 	return true;
 }

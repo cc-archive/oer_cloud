@@ -50,6 +50,10 @@ else {
 
 	if ( isset($_POST['doModifyUsers']) ) {
 		$userservice->modifyUsers();
+	} elseif ( isset($_POST['doAddUser']) ) {
+		$userservice->addUser($_POST['username'], $_POST['name'], $_POST['homepage'], $_POST['password'], $_POST['email']);
+	} elseif ( isset($_POST['doEditUser']) ) {
+		$userservice->editUser();
 	} elseif ( isset($_POST['doModifyBookmarks']) ) {
 		$bookmarkservice->modifyBookmarks();
 	} elseif ( isset($_POST['doRenameTags']) ) {
@@ -72,6 +76,10 @@ else {
 		switch ( $_REQUEST['mod'] ) {
 			case "users":
     			$templateservice->loadTemplate('admin-users.tpl', $tplVars);
+				break;
+			case "edituser":
+    			$tplVars['user'] = $userservice->_getuser("uId", $_REQUEST['user']);
+    			$templateservice->loadTemplate('admin-edituser.tpl', $tplVars);
 				break;
 			case "bookmarks":
     			$templateservice->loadTemplate('admin-bookmarks.tpl', $tplVars);

@@ -80,7 +80,7 @@ if ( ! empty($users) ) {
 		echo <<<HTML
 			<tr class='$bgColor'>
 				<td><input type='checkbox' name='userList[]' value='{$user['uId']}' /></td>
-				<td>{$user['username']}</td>
+				<td><a href='$formaction?mod=edituser&user={$user['uId']}' title='Edit this user'>{$user['username']}</a></td>
 				<td>{$user['name']}</td>
 				<td>{$user['email']}</td>
 				<td>{$user['homepage']}</td>
@@ -124,6 +124,19 @@ echo <<<HTML
 	<div class='bgYellow' style='padding-left: .5ex; padding-right: .5ex; float: left;'>Not activated</div>
 	<div class='bgRed' style='padding-left: .5ex; padding-right: .5ex; float: left;'>Flagged</div>
 </div>
+
+<div style='clear: left; padding-top: 1em; font-weight: bold;'>
+	Add a user
+</div>
+
+<form action='$formaction' method='post' id='frmAddUser' onsubmit='return validateAddUserForm("frmAddUser");'>
+	<div><input type='text' name='username' size='40'/> Username</div>
+	<div><input type='text' name='password' size='40'/> Password</div>
+	<div><input type='text' name='name' size='40'/> Full name</div>
+	<div><input type='text' name='email' size='40'/> Email</div>
+	<div><input type='text' name='homepage' size='40'/> Homepage</div>
+	<div><input type='submit' name='doAddUser' value='Add' /></div>
+</form>
 
 HTML;
 
