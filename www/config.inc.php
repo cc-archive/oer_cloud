@@ -102,8 +102,11 @@ $defaultPerPage     = 10;
 $defaultRecentDays  = 14;
 $defaultOrderBy     = 'date_desc';
 $TEMPLATES_DIR      = dirname(__FILE__) .'/templates/';
-#$root               = 'http://oercloud.creativecommons.org/';
-$root               = 'http://localhost/cc/oercloud/www/';
+if ( $_SERVER['SERVER_NAME'] == 'localhost' ) {
+	$root               = 'http://localhost/cc/oercloud/www/';
+} else {
+	$root               = 'http://oercloud.creativecommons.org/';
+}
 $cookieprefix       = 'CC_OER';
 $tableprefix        = 'sc_';
 $adminemail         = 'webmaster@creativecommons.org';
