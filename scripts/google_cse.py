@@ -2,16 +2,18 @@
 
 """Tools for creating XML files for the Google OER Cloud CSE"""
 
+import os
 import sqlalchemy
 import xml.dom.minidom
 
 # User defined configurations:
 db = sqlalchemy.create_engine("mysql://root@localhost/oercloud")
-context_fname = "/home/nkinkade/cc/devel/oercloud/api/cse/context.xml"
-# This is the base file name for annotations files.  If there are more than one
+context_fname = "/home/nkinkade/cc/devel/oercloud/www/api/cse/context.xml"
+include_baseurl = "http://localhost/cc/oercloud/www/api/cse"
+# This is the base name for annotations files.  If there are more than one
 # then this file path will be appended with '<file_count>.xml', otherwise
 # simply '.xml'.
-annot_basename = "/home/nkinkade/cc/devel/oercloud/api/cse/annotations"
+annot_basepath = "/home/nkinkade/cc/devel/oercloud/www/api/cse/annotations"
 
 # Setup the database objects
 metadata = sqlalchemy.MetaData(db)
@@ -30,23 +32,29 @@ def get_tags(bookmarkid):
 	return tags_tbl.select(tags_tbl.c.bId == bookmarkid).execute().fetchall()
 
 
-def create_el(el_name):
-	"""Returns an XML element with the given name."""
-	return xmldoc.createElement(el_name)
-
-
 def append_el(child, parent):
 	"""Append an XML element to another element."""
 	return parent.appendChild(child)
 
 
-def write_annot(doc, fnum=NULL):
-	"""Write out an annotations file."""
-	fname = "%s%s.xml" % (annot_basename, fnum)
+def write_annot(doc, fnum):
+	"""Write out an annotations file form the current XML object."""
+	fnum = fnum + 1
+	fname = "%s-%d.xml" % (annot_basepath, fnum)
 	fp = open(fname, "w")
 	doc.writexml(fp, "", "\t", "\n", "UTF-8")
 	fp.close()
-	return fnum = fnum + 1
+	return fnum
+
+
+def make_annot_object():
+	"""Creates empty annotations XML object ready for new annotations."""
+	xmlobj = xml.dom.minidom.Document()
+	root_el = xmlobj.createElement("GoogleCustomizations")
+	append_el(root_el, xmlobj)
+	annots_el = xmlobj.createElement("Annotations")
+	append_el(annots_el, root_el)
+	return xmlobj
 
 
 def make_annotations():
@@ -58,13 +66,7 @@ def make_annotations():
 	new document will be started.
 
 	"""
-	xmldoc = xml.dom.minidom.Document()
-
-	root_el = xmldoc.createElement("GoogleCustomizations")
-	append_el(root_el, xmldoc)
-
-	annots_el = create_el("Annotations")
-	append_el(annots_el, root_el)
+	xmldoc = make_annot_object();
 
 	# Grab all of the booksmarks from the database
 	bookmarks = bookmarks_tbl.select().execute().fetchall()
@@ -73,16 +75,16 @@ def make_annotations():
 	file_count = 0
 
 	for bookmark in bookmarks:
-		annot_el = create_el("Annotation")
+		annot_el = xmldoc.createElement("Annotation")
 		annot_el.setAttribute("about", bookmark.bAddress)
 		annot_el.setAttribute("score", "1")
-		append_el(annot_el, annots_el)
+		append_el(annot_el, xmldoc.getElementsByTagName("Annotations")[0])
 
-		cse_lbl = create_el("Label")
+		cse_lbl = xmldoc.createElement("Label")
 		cse_lbl.setAttribute("name", "_cse_cclearn_oe_search")
 		append_el(cse_lbl, annot_el)
 
-		user_lbl = create_el("Label")
+		user_lbl = xmldoc.createElement("Label")
 		user_lbl.setAttribute("name", get_user(bookmark.uId))
 		append_el(user_lbl, annot_el)
 
@@ -94,14 +96,19 @@ def make_annotations():
 		#	annotation.appendChild(tag_lbl)
 		#	tcount = tcount + 1
 
+		# If the file size grows to around 3MB, then write it out and start a
+		# new one.  Google only accepts file of 3MB and smaller, but will
+		# accept multiple files in the form of an <Include>
 		if len(xmldoc.toprettyxml()) > 3000000:
 			file_count = write_annot(xmldoc, file_count)
+			# create a fresh annotations XML object
+			xmldoc = make_annot_object()
 
-	write_annot(xmldoc, file_count)
+	file_count = write_annot(xmldoc, file_count)
 	return file_count
 
 
-def make_context(fcount=1):
+def make_context(fcount):
 	"""Creates the principal context file for the Gooogle OER Cloud CSE.
 
 	Depending on the value of the single argument fcount, the file will tell
@@ -111,58 +118,59 @@ def make_context(fcount=1):
 	"""
 	xmldoc = xml.dom.minidom.Document()
 
-	root_el = create_el("GoogleCustomizations")
+	root_el = xmldoc.createElement("GoogleCustomizations")
 	root_el.setAttribute("version", "1.0")
 	append_el(root_el, xmldoc)
 
-	cse_el = create_el("CustomSearchEngine")
+	cse_el = xmldoc.createElement("CustomSearchEngine")
 	cse_el.setAttribute("keywords", "oai")
 	cse_el.setAttribute("title", "Open Education Search")
 	cse_el.setAttribute("language", "en")
 	append_el(cse_el, root_el)
 
-	context_el = create_el("Context")
+	context_el = xmldoc.createElement("Context")
 	append_el(context_el, cse_el)
 
-	bglabels_el = create_el("BackgroundLabels")
+	bglabels_el = xmldoc.createElement("BackgroundLabels")
 	append_el(bglabels_el, context_el)
 
-	cse_lbl = create_el("Label")
+	cse_lbl = xmldoc.createElement("Label")
 	cse_lbl.setAttribute("name", "_cse_cclearn_oe_search")
 	cse_lbl.setAttribute("mode", "FILTER")
 	append_el(cse_lbl, bglabels_el)
 
-	look_el = create_el("LookAndFeel")
+	look_el = xmldoc.createElement("LookAndFeel")
 	look_el.setAttribute("nonprofit", "true")
 	append_el(look_el, cse_el)
 
-	facet_el = create_el("Facet")
-	append_el(facet_el, context_el)
-
 	# we are not outputting facets at the moment due to a problem with the CSE.
 	# if at some point in the future we want facets then uncomment the following
+	#
+	#facet_el = xmldoc.createElement("Facet")
+	#append_el(facet_el, context_el)
+	#
 	## output the username"s as facets
 	#users = users_tbl.select(order_by=users_tbl.c.username).execute().fetchall()
 	#for user in users:
-	#	fitem_el = create_el("FacetItem")
+	#	fitem_el = xmldoc.createElement("FacetItem")
 	#	fitem_el.setAttribute("title", user.username)
 	#	append_el(fitem_el, facet_el)
 	#
-	#	user_lbl = create_el("Label")
+	#	user_lbl = xmldoc.createElement("Label")
 	#	user_lbl.setAttribute("name", user.username)
 	#	append_el(user_lbl, fitem_el)
 	#
 	##output each tag as a facet
 	#tags = tags_tbl.select(order_by=tags_tbl.c.tag).execute().fetchall()
 	#for tag in tags:
-	#	fitem_el = create_el("FacetItem")
+	#	fitem_el = xmldoc.createElement("FacetItem")
 	#	fitem_el.setAttribute("title", tag.tag)
 	#	append_el(fitem_el, facet_el)
 	#
 	#	# don"t create a facet if the tag was generated by Scuttle i.e. the
 	#	# first 7 characters are "system:"
 	#	if tag.tag[:7] != "system:":
-	#		tag_lbl = create_el("Label")
+	#		tag_lbl = xmldoc.createElement("Label")
 	#		tag_lbl.setAttribute("name", tag.tag)
 	#		tag_lbl.setAttribute("mode", "FILTER")
 	#		append_el(tag_lbl, fitem_el)
@@ -170,15 +178,15 @@ def make_context(fcount=1):
 	# Write out as many includes as there are annotation files as determined by
 	# the argument fcount.
 	for idx in range(fcount):
-		include_el = create_el("Include")
+		include_url = "%s/%s-%d.xml" % (include_baseurl,
+			os.path.basename(annot_basepath), (idx + 1))
+		include_el = xmldoc.createElement("Include")
 		include_el.setAttribute("type", "Annotations")
-		include_el.setAttribute("href", 
-			"http://oercloud.creativecommons.org/api/google_cse/annotations%d.xml"
-			% idx)
+		include_el.setAttribute("href", include_url)
 		append_el(include_el, root_el)
 
 	fp = open(context_fname, "w")
-	doc.writexml(fp, "", "\t", "\n", "UTF-8")
+	xmldoc.writexml(fp, "", "\t", "\n", "UTF-8")
 	fp.close()
 
 if __name__ == "__main__":
