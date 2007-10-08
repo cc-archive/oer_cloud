@@ -27,8 +27,8 @@ header('Content-Type: text/xml');
 echo <<<HEADER
 <?xml version="1.0" encoding="UTF-8" ?>
 <GoogleCustomizations version="1.0">
-	<CustomSearchEngine keywords="oai" Title="Open Education Search" language="en">
-
+  <CustomSearchEngine keywords="oai" language="en" top_refinements="5">
+    <Title>Open Education Search</Title>
 HEADER;
 
 /*
@@ -43,35 +43,45 @@ echo <<<FACETS
     </BackgroundLabels>
 FACETS;
 
-#
-#    <Facet>
-#// spit out the usernames as facets
-#foreach ($users as $user) {
-#
-#	if ($user['username'] == 'admin') continue;
-#
-#	echo <<<FACET
-#	<FacetItem title='{$user['username']}'>
-#		   <Label name='{$user['username']}' mode='FILTER' />
-#	</FacetItem>
-#FACET;
-#}
-#
-#
-#// spit out the facets to make labels show up
-#foreach ($tags as $tag) {
-#	# don't output system generated tags
-#	if ( substr($tag['tag'], 0, 7) != "system:" ) {
-#	   # convert special chars to character entities
-#	   $tag['tag'] = filter($tag['tag'], "xml");
-#	   echo <<<FACET
-#		<FacetItem title='{$tag['tag']}'>
-#			   <Label name='{$tag['tag']}' mode='FILTER' />
-#		</FacetItem>
-#FACET;
-#	}
-#}
-#echo "    </Facet>";
+
+// spit out the usernames as facets
+foreach ($users as $user) {
+
+	if ($user['username'] == 'admin') continue;
+
+	$lc_username = strtolower($user['username']);
+
+	echo <<<FACET
+    <Facet>
+      <FacetItem title='{$user['username']}'>
+         <Label name='{$user['username']}' mode='FILTER'>
+         <Rewrite>{$lc_username}</Rewrite>
+	 </Label>
+      </FacetItem>
+    </Facet>
+FACET;
+}
+
+
+// spit out the facets to make labels show up
+foreach ($tags as $tag) {
+	# don't output system generated tags
+	if ( substr($tag['tag'], 0, 7) != "system:" ) {
+	   # convert special chars to character entities
+	   $tag['tag'] = filter($tag['tag'], "xml");
+	   $lc_tag = strtolower($tag['tag']);
+
+	   echo <<<FACET
+    <Facet>
+		<FacetItem title='{$tag['tag']}'>
+			   <Label name='{$tag['tag']}' mode='FILTER'>
+			   <Rewrite>{$lc_tag}</Rewrite>
+			   </Label>
+		</FacetItem>
+    </Facet>
+FACET;
+	}
+}
 echo " </Context>";
 
 echo <<<CLOSE_HEADER

@@ -39,7 +39,7 @@ foreach ( $bookmarks['bookmarks'] as $bookmark ) {
 	# output the provider as a label
 	$provider = $userservice->getUser($bookmark['uId']);
 	$provider = $provider["username"];
-	//echo "		<Label name='$provider' />\n";
+	echo "		<Label name='$provider' />\n";
 
 	# Output the tags
 	if ( count($bookmark['tags']) > 0 ) {
@@ -49,7 +49,7 @@ foreach ( $bookmarks['bookmarks'] as $bookmark ) {
 				# if there are any single or double quotes in the tag, turn them into their html entities
 				$bTag = htmlspecialchars($bTag, ENT_QUOTES);
 				$bTag = convertTag($bTag);
-				//echo "			<Label name='$bTag' />\n";
+				echo "			<Label name='$bTag' />\n";
 			}
 		}
 	}
