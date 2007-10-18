@@ -18,7 +18,7 @@ import sqlalchemy
 warnings.filterwarnings(action='error', message='.*')
 
 # setup database connectivity
-db = sqlalchemy.create_engine('mysql://root@localhost/oer', convert_unicode=True)
+db = sqlalchemy.create_engine('mysql://root@localhost/oercloud', convert_unicode=True)
 metadata = sqlalchemy.MetaData(db)
 oer_feeds = sqlalchemy.Table('oer_feeds', metadata, autoload=True)
 bookmarks = sqlalchemy.Table('sc_bookmarks', metadata, autoload=True)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Tools for creating XML files for the Google OER Cloud CSE"""
+"""Tools for creating static XML files for the Google OER Cloud CSE"""
 
 import os
 import sqlalchemy
@@ -8,12 +8,12 @@ import xml.dom.minidom
 
 # User defined configurations:
 db = sqlalchemy.create_engine("mysql://root@localhost/oercloud")
-context_fname = "/home/nkinkade/cc/devel/oercloud/www/api/cse/context.xml"
-include_baseurl = "http://localhost/cc/oercloud/www/api/cse"
+context_fname = "/var/www/oercloud.creativecommons.org/www/api/cse/context.xml"
+include_baseurl = "http://oercloud.creativecommons.org/api/cse"
 # This is the base name for annotations files.  If there are more than one
 # then this file path will be appended with '<file_count>.xml', otherwise
 # simply '.xml'.
-annot_basepath = "/home/nkinkade/cc/devel/oercloud/www/api/cse/annotations"
+annot_basepath = "/var/www/oercloud.creativecommons.org/www/api/cse/annotations"
 
 # Setup the database objects
 metadata = sqlalchemy.MetaData(db)
@@ -74,6 +74,9 @@ def make_annotations():
 	# This variable will track how many annotation files we have written
 	file_count = 0
 
+	# To keep track of how many bookmarks we have processed
+	bmcount = 1
+
 	for bookmark in bookmarks:
 		annot_el = xmldoc.createElement("Annotation")
 		annot_el.setAttribute("about", bookmark.bAddress)
@@ -97,12 +100,22 @@ def make_annotations():
 		#	tcount = tcount + 1
 
 		# If the file size grows to around 3MB, then write it out and start a
-		# new one.  Google only accepts file of 3MB and smaller, but will
-		# accept multiple files in the form of an <Include>
-		if len(xmldoc.toprettyxml()) > 3000000:
-			file_count = write_annot(xmldoc, file_count)
-			# create a fresh annotations XML object
-			xmldoc = make_annot_object()
+		# new one.  Google only accepts files of 3MB and smaller, but will
+		# accept multiple files in the form of an <Include>.
+		# Only check the size every 1000 bookmarks, otherwise this process
+		# is very slow.
+		if ( bmcount % 1000 == 0 ):
+			# The somewhat dubious assumption here is that a character
+			# will be equal to 1 byte.  It may not always be true, but
+			# it should usually be true for UTF8, true enough to serve
+			# the purpose here.  We check for something somewhat less
+			# than 3MB to give us some room for error.
+			if len(xmldoc.toprettyxml()) > 3000000:
+				file_count = write_annot(xmldoc, file_count)
+				# create a fresh annotations XML object
+				xmldoc = make_annot_object()
+
+		bmcount = bmcount + 1
 
 	file_count = write_annot(xmldoc, file_count)
 	return file_count
