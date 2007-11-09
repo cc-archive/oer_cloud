@@ -8,12 +8,12 @@ import xml.dom.minidom
 
 # User defined configurations:
 db = sqlalchemy.create_engine("mysql://root@localhost/oercloud")
-context_fname = "/var/www/oercloud.creativecommons.org/www/api/cse/context.xml"
-include_baseurl = "http://oercloud.creativecommons.org/api/cse"
+context_fname = "/var/www/oesearch.creativecommons.org/www/google_cse/context.xml"
+include_baseurl = "http://oesearch.creativecommons.org/google_cse"
 # This is the base name for annotations files.  If there are more than one
 # then this file path will be appended with '<file_count>.xml', otherwise
 # simply '.xml'.
-annot_basepath = "/var/www/oercloud.creativecommons.org/www/api/cse/annotations"
+annot_basepath = "/var/www/oesearch.creativecommons.org/www/google_cse/annotations"
 
 # Setup the database objects
 metadata = sqlalchemy.MetaData(db)
@@ -68,8 +68,13 @@ def make_annotations():
 	"""
 	xmldoc = make_annot_object();
 
-	# Grab all of the booksmarks from the database
-	bookmarks = bookmarks_tbl.select().execute().fetchall()
+	# Grab all of the booksmarks from the database where the user is not
+	# flagged and where the bookmark isn't flagged.
+	# NOTE 20071109 (nkinkade):  at the moment we are only pulling URLs for
+	# user with id 39.  User 39 is the special "cclearn" user under whose
+	# name are stored only the cleaned up URL list that was provided by
+	# Ahrash and OER Commons.
+	bookmarks = bookmarks_tbl.select(bookmarks_tbl.c.uId=='39').execute().fetchall()
 
 	# This variable will track how many annotation files we have written
 	file_count = 0
@@ -78,6 +83,16 @@ def make_annotations():
 	bmcount = 1
 
 	for bookmark in bookmarks:
+		# If bAddress ends in a / then append an asterisk, which makes it
+		# URL pattern, so any files within that dir should be returned as
+		# well.
+		if bookmark.bAddress[-1:] == '/':
+			bookmark.bAddress = bookmark.bAddress + '*'
+		# Strip off the protocol identifier http{s}://
+		if bookmark.bAddress[:7] == 'http://':
+			bookmark.bAddress = bookmark.bAddress[7:]
+		elif bookmark.bAddress[:8] == 'https://':
+			bookmark.bAddress = bookmark.bAddress[8:]
 		annot_el = xmldoc.createElement("Annotation")
 		annot_el.setAttribute("about", bookmark.bAddress)
 		annot_el.setAttribute("score", "1")
@@ -86,10 +101,6 @@ def make_annotations():
 		cse_lbl = xmldoc.createElement("Label")
 		cse_lbl.setAttribute("name", "_cse_cclearn_oe_search")
 		append_el(cse_lbl, annot_el)
-
-		user_lbl = xmldoc.createElement("Label")
-		user_lbl.setAttribute("name", get_user(bookmark.uId))
-		append_el(user_lbl, annot_el)
 
 		# Uncomment these lines to include tags/facets
 		#tags = get_tags(bookmark.bId)
@@ -136,10 +147,13 @@ def make_context(fcount):
 	append_el(root_el, xmldoc)
 
 	cse_el = xmldoc.createElement("CustomSearchEngine")
-	cse_el.setAttribute("keywords", "oai")
-	cse_el.setAttribute("title", "Open Education Search")
 	cse_el.setAttribute("language", "en")
 	append_el(cse_el, root_el)
+
+	title_el = xmldoc.createElement("Title")
+	title_text = xmldoc.createTextNode("Open Education Search")
+	append_el(title_text, title_el)
+	append_el(title_el, cse_el)
 
 	context_el = xmldoc.createElement("Context")
 	append_el(context_el, cse_el)

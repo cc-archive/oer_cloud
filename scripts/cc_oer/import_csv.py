@@ -23,14 +23,14 @@ import sqlalchemy
 field_delimiter = '^'
 line_terminator = '\n'
 tag_delimiter = ','  # specify the delimiter for the items in tag column
-user_id = '19'  # the id of the user to who the bookmarks will be assigned
+user_id = '39'  # the id of the user to who the bookmarks will be assigned
 ##### -------------------------------------------------------------- #####
 
 # parse the file passed in as the last argument
 reader = csv.reader(open(sys.argv[-1]), delimiter=field_delimiter, lineterminator=line_terminator)
 
 # setup database connectivity
-db = sqlalchemy.create_engine('mysql://root:ccadmin@localhost/oer', convert_unicode=True)
+db = sqlalchemy.create_engine('mysql://root@localhost/oercloud', convert_unicode=True)
 metadata = sqlalchemy.MetaData(db)
 bookmarks = sqlalchemy.Table('sc_bookmarks', metadata, autoload=True)
 tags_tbl = sqlalchemy.Table('sc_tags', metadata, autoload=True)

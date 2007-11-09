@@ -41,13 +41,20 @@ for feed in feeds:
 		# make the date format the the OER Cloud database (scuttle) is expecting
 		pretty_datetime = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
 
-		# before doing anything, we check to see if this bookmark already exists
-		# in the database, if it does the we skip this entry.  since every url
-		# also has an md5 hash stored in the db, then can easily look for that
-		# value
+		# before doing anything, we check to see if this bookmark is already
+		# in the database for the given user.  If it is then skip this entry.
+		# Every url also has an md5 hash stored in the db.  We use this and the
+		# uId of the current feed to determine if we should import it.
 		bookmark_hash = md5.new(entry.link).hexdigest()
-		result = bookmarks.select(bookmarks.columns.bHash == bookmark_hash).execute()
-		if result.rowcount == 1:
+		result = bookmarks.select(
+				sqlalchemy.and_(
+					bookmarks.c.bHash == bookmark_hash,
+					bookmarks.c.uId == feed.user_id
+				)
+			).execute()
+
+		# if any rows were returned, then skip this entry
+		if result.rowcount > 0:
 			continue
 
 		# build a dict representing the new row that we will insert.  for
