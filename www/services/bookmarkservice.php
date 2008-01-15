@@ -47,6 +47,7 @@ class BookmarkService {
             if ($include_tags) {
                 $tagservice = & ServiceFactory :: getServiceInstance('TagService');
                 $row['tags'] = $tagservice->getTagsForBookmark($bid);
+                $row = $this->addCcFields($row); // Break out CC-specific fields
             }
             return $row;
         } else {
@@ -355,13 +356,16 @@ class BookmarkService {
             return false;
         }
 
+
         $total = $row['total'];
 
         $bookmarks = array();
         while ($row = & $this->db->sql_fetchrow($dbresult)) {
+            $row = $this->addCcFields($row); // Break out CC-specific fields
             $row['tags'] = $tagservice->getTagsForBookmark(intval($row['bId']));
             $bookmarks[] = $row;
         }
+
         return array ('bookmarks' => $bookmarks, 'total' => $total);
     }
 
@@ -653,6 +657,36 @@ class BookmarkService {
 		$qid = $this->db->sql_query($sql);
 		return $this->db->sql_fetchrowset($qid);
 	}
+
+
+    /**
+     * We are storing certain CC-specific data as tags in the form of 
+     * cc:<fieldname>::<value>.  This is more extensible and flexible than 
+     * altering the database to add/remove fields.  This function will take a 
+     * given bookmark record and then fetch any CC specific tags and will add 
+     * them to the record so that they appear to other parts of the system as 
+     * regular fields.
+     */
+    function addCcFields($record) {
+
+        #print_r($record);exit;
+        $tagservice = & ServiceFactory :: getServiceInstance('TagService');
+        $ccTags = $tagservice->getCcTagsForBookmark(intval($record['bId']));
+        if ( count($ccTags) ) {
+            foreach ( $ccTags as $tag ) {
+                $fieldName = substr($tag, 3); // Strip the 'cc:' part
+                // Break the special tag into token and value
+                list($token,$value) = explode('::', $fieldName);
+                // Make the field look like other Scuttle fields by
+                // prepending a "b".  Aesthetics.
+                $fieldName = "b" . ucfirst($token);
+                $record[$fieldName] = $value;
+            }
+        }
+
+        return $record;
+
+    }
 
 
 }

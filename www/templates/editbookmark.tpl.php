@@ -41,7 +41,27 @@ window.onload = function() {
     <td></td>
 </tr>
 <tr>
-    <th align="left"><?php echo T_('Tags'); ?></th>
+    <th align="left"><?php echo T_('License'); ?></th>
+    <td><input type="text" name="cc:license" size="75" maxlength="255" value="<?php echo filter($row['bLicense'], 'xml'); ?>" /></td>
+    <td>&larr; <?php echo T_('Required'); ?></td>
+</tr>
+<tr>
+    <th align="left"><?php echo T_('Subject'); ?></th>
+    <td><input type="text" name="cc:subject" size="75" maxlength="255" value="<?php echo filter($row['bSubject'], 'xml'); ?>" /></td>
+    <td>&larr; <?php echo T_('Required'); ?></td>
+</tr>
+<tr>
+    <th align="left"><?php echo T_('Grade level'); ?></th>
+    <td><input type="text" name="cc:gradelevel" size="75" maxlength="255" value="<?php echo filter($row['bGradelevel'], 'xml'); ?>" /></td>
+    <td>&larr; <?php echo T_('Required'); ?></td>
+</tr>
+<tr>
+    <th align="left"><?php echo T_('Language'); ?></th>
+    <td><input type="text" name="cc:language" size="75" maxlength="255" value="<?php echo filter($row['bLanguage'], 'xml'); ?>" /></td>
+    <td>&larr; <?php echo T_('Required'); ?></td>
+</tr>
+<tr>
+    <th align="left"><?php echo T_('Other Tags'); ?></th>
     <td><input type="text" id="tags" name="tags" size="75" value="<?php echo filter(implode(', ', $row['tags']), 'xml'); ?>" /></td>
     <td>&larr; <?php echo T_('Comma-separated'); ?></td>
 </tr>

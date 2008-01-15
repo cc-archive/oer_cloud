@@ -107,6 +107,15 @@ if ($loggedon && isset($_POST['submitted'])) {
             $description = trim($_POST['description']);
             $status = intval($_POST['status']);
             $categories = trim($_POST['tags']);
+
+            // Add the ccLearn-specific fields as tags, if they aren't empty.
+            // All ccLearn-specific form names should begin with "cc:"
+            foreach ( $_POST as $key => $value ) {
+                if ( 0 === strpos($key, 'cc:') ) {
+                    $categories .= trim($value) ? ", $key::" . trim($value) : "" ;
+                }
+            }
+
             $saved = true;
             if ($bookmarkservice->addBookmark($address, $title, $description, $status, $categories)) {
                 if (isset($_POST['popup'])) {

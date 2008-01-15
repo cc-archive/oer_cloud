@@ -50,6 +50,15 @@ if (!($row = $bookmarkservice->getBookmark(intval($bookmark), true))) {
             $description = trim($_POST['description']);
             $status = intval($_POST['status']);
             $tags = trim($_POST['tags']);
+
+            // Add the ccLearn-specific fields as tags, if they aren't empty.
+            // All ccLearn-specific form names should begin with "cc:"
+            foreach ( $_POST as $key => $value ) {
+                if ( 0 === strpos($key, 'cc:') ) {
+                    $tags .= trim($value) ? ", $key::" . trim($value) : "" ;
+                }
+            }
+
             $logged_on_user = $userservice->getCurrentUser();
             if (!$bookmarkservice->updateBookmark($bId, $address, $title, $description, $status, $tags)) {
                 $tplvars['error'] = T_('Error while saving your bookmark');

@@ -82,6 +82,7 @@ foreach ($tags as $tag) {
 FACET;
 	}
 }
+
 echo " </Context>";
 
 echo <<<CLOSE_HEADER
