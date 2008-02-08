@@ -9,6 +9,7 @@ class OERCommonsSearch {
     public $search_string = NULL;
     public $results = array();
     public $result_count = NULL;
+    public $total_results = NULL;
     public $result_error = NULL;
     public $remote_method = "simpleSearch";
     public $remote_url = "http://www.oercommons.org/service/";
@@ -19,7 +20,7 @@ class OERCommonsSearch {
 
         # Don't continue if the PHP xmlrpc libs are not available
         if ( ! function_exists("xmlrpc_encode_request") ) {
-            trigger_error("The PHP xmlrpc must be installed to use this class");
+            trigger_error("PHP xmlrpc must be installed to use this class");
             exit;
         }
 
@@ -60,6 +61,7 @@ class OERCommonsSearch {
         } else {
             $this->results = $xmlrpc_data[0];
             $this->result_count = count($this->results);
+	    $this->total_results = $xmlrpc_data[1];
         }
     }
 
@@ -87,7 +89,7 @@ class OERCommonsSearch {
                     $subjects = rtrim($subjects, ", ");
                 }
                 $pretty_results[$i] = <<<HTML
-<div class='result'>
+<div class='oerc_Result'>
     <div><a href='$this->base_url/{$rs[$i]['path']}'>{$rs[$i]['title']}</a></div>
     <div><strong>Subject</strong>: $subjects</div>
     <div><strong>Summary</strong>: {$rs[$i]['description']}</div>
