@@ -1,4 +1,4 @@
-## Copyright (c) 2007 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2007-2008 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -21,13 +21,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = "cc_oer",
+    name = "aggregator",
     version = "0.2",
-    packages = ['cc_oer'],
+    packages = ['aggregator', 'oercloud'],
+    package_dir = {'' : 'src'},
 
     # scripts and dependencies
     install_requires = ['setuptools',
                         'lxml',
+                        'storm',
                         ],
 
     entry_points = { 'console_scripts':
