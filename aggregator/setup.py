@@ -29,14 +29,20 @@ setup(
     # scripts and dependencies
     install_requires = ['setuptools',
                         'lxml',
-                        'storm',
+                        'MySQL-python',
+                        'SQLAlchemy',
                         ],
 
     entry_points = { 'console_scripts':
-                     ['import_nsta = cc_oer.import_scripts:nsta',
-                      'import_oerc = cc_oer.import_scripts:oerc',
-                      'import_rss = cc_oer.rss:rss_rdf',
+                     ['update = aggregator.cli:cli',
                       ],
+
+                     'cc.aggregator':
+                         ['rss10 = aggregator.source.feed:update',
+                          'rss20 = aggregator.source.feed:update',
+                          'atom  = aggregator.source.feed:update',
+                          'oaipmh = aggregator.source.oaipmh:update',
+                          ],
                      },
 
     # author metadata
