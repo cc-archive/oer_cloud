@@ -29,6 +29,7 @@ setup(
     # scripts and dependencies
     install_requires = ['setuptools',
                         'lxml',
+                        'opml',
                         'MySQL-python',
                         'SQLAlchemy',
                         ],

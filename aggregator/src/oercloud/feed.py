@@ -2,6 +2,12 @@ from sqlalchemy import Table, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import mapper
 from oercloud import metadata
 
+# feed type "contstants"
+OPML = 'opml'
+RSS10 = 'rss10'
+RSS20 = 'rss20'
+OAIPMH= 'oai-pmh'
+
 feed_table = Table('oer_feeds', metadata,
                    Column('id', Integer, primary_key=True),
                    Column('url', String(255)),
