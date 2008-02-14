@@ -66,7 +66,8 @@ def check_feeds():
                 handlers[feed.feed_type].load()(feed)
             else:
                 # no handler... log a warning
-                pass
+                aggregator.LOG.warning("No handler for feed type %s" % 
+                                       feed.feed_type)
 
 def update():
     """Perform a full update, end to end."""
