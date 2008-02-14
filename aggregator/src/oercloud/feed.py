@@ -6,7 +6,7 @@ from oercloud import metadata
 OPML = 'opml'
 RSS10 = 'rss10'
 RSS20 = 'rss20'
-OAIPMH= 'oai-pmh'
+OAIPMH= 'oaipmh'
 
 feed_table = Table('oer_feeds', metadata,
                    Column('id', Integer, primary_key=True),
