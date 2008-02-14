@@ -44,7 +44,7 @@ setup(
                          ['rss10 = aggregator.source.feed:update',
                           'rss20 = aggregator.source.feed:update',
                           'atom  = aggregator.source.feed:update',
-                          'oaipmh = aggregator.source.oaipmh:update',
+                          'oaipmh = aggregator.source.oai:update',
                           'Feed  = aggregator.source.sniff:update',
                           ],
                      },
