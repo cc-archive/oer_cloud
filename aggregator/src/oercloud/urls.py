@@ -66,7 +66,7 @@ class TagList(list):
     def __contains__(self, item):
 
         for t in self:
-            if t.tag.lower() == item.tag.lower():
+            if t.tag.lower()[:255] == item.tag.lower()[:255]:
                 return True
 
         return False
