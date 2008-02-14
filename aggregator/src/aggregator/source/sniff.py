@@ -1,8 +1,9 @@
 import oaipmh.client as oaiclient
 
+import oercloud.feed
+
 import aggregator
-import feed
-import oaipmh
+import aggregator.handlers
 
 def update(feed):
     """Sniff the actual type of the feed and dispatch to that handler."""
@@ -16,9 +17,9 @@ def update(feed):
         oai_client.identify()
 
         # no error raised, assume it's OAI-PMH
-        oaipmh.update(feed)
+        handlers[oercloud.feed.OAIPMH].load()(feed)
 
     except oaipmh.error.XMLSyntaxError, e:
 
         # not OAI-PMH
-        feed.update(feed)
+        handlers[oercloud.feed.RSS20].load()(feed)
