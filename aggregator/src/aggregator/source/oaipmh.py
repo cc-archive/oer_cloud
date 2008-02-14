@@ -1,4 +1,7 @@
 """OAI-PMH backend."""
 
+import aggregator
+
 def update(source):
-    print source.url
+
+    aggregator.LOG.debug("Processing %s as OAI-PMH" % source.url)

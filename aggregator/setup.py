@@ -30,6 +30,8 @@ setup(
     install_requires = ['setuptools',
                         'lxml',
                         'opml',
+                        'pyoai',
+                        'feedparser',
                         'MySQL-python',
                         'SQLAlchemy',
                         ],
@@ -43,6 +45,7 @@ setup(
                           'rss20 = aggregator.source.feed:update',
                           'atom  = aggregator.source.feed:update',
                           'oaipmh = aggregator.source.oaipmh:update',
+                          'Feed  = aggregator.source.sniff:update',
                           ],
                      },
 
